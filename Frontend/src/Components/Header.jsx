@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     <Navbar className="sticky top-0 border-b-2  z-50 bg-gradient-to-br from-lime-100 to-green-800 text-white p-8 rounded-b-lg shadow-lg">
-      <div className="container mx-auto flex items-center justify-between py-4">
+      <div className="container mx-auto flex items-center justify-between py-1">
         {/* Logo */}
         <div className="flex flex-col justify-center items-center gap-2">
           <img
