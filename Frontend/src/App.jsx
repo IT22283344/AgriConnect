@@ -6,16 +6,20 @@ import Header from './Components/Header';
 import DashBoard from './Pages/DashBoard';
 import PrivateRoute from './Components/PrivateRoute';
 import OnlyAdminPrivateRoute from './Components/OnlyAdminPrivateRoute';
+import ScrollToTop from './Components/ScrollTop';
+import Support from './Pages/Support';
 
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop/>
       <Header/>
       <Routes>
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
-
+        
+        <Route path="/support/:slug" element={<Support/>} />
         <Route element={<PrivateRoute />} />
         <Route path="/dashboard" element={<DashBoard />} />
          

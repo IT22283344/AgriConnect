@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Alert, Button, Label, TextInput, Spinner, Select } from "flowbite-react";
+import {
+  Alert,
+  Button,
+  Label,
+  TextInput,
+  Spinner,
+  Select,
+} from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuthenticate from "../Components/OAuthenticate";
 
@@ -9,7 +16,8 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
@@ -24,7 +32,7 @@ export default function SignUp() {
       !formData.province ||
       !formData.district ||
       !formData.town ||
-      !formData.role 
+      !formData.role
     ) {
       return setError("Please Fill all Fields");
     }
@@ -56,6 +64,23 @@ export default function SignUp() {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const provinceDistricts = {
+    western: ["Colombo", "Gampaha", "Kalutara"],
+    north: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+    eastern: ["Batticaloa", "Ampara", "Trincomalee"],
+    northwestern: ["Kurunegala", "Puttalam"],
+    central: ["Kandy", "Matale", "Nuwara Eliya"],
+    southern: ["Galle", "Matara", "Hambantota"],
+    uva: ["Badulla", "Monaragala"],
+    northcentral: ["Anuradhapura", "Polonnaruwa"],
+    sabaragamuwa: ["Ratnapura", "Kegalle"],
+  };
+
+  const handleProvinceChange = (e) => {
+    setSelectedProvince(e.target.value);
+    setSelectedDistrict(""); // Reset district when province changes
   };
 
   return (
@@ -127,59 +152,39 @@ export default function SignUp() {
             />
           </div>
           <div>
-            <Label value=" Province" />
+            <label>Province</label>
             <Select
-              type="text"
-              placeholder="Province"
               id="province"
-              onChange={handleChange}
-            > <option value=""> Select</option>
-              <option value="western">Western Province</option>
-              <option value="north">North Province</option>
-              <option value="estern">Estern Province</option>
-              <option value="northwestern">North Western Province</option>
-              <option value="central">Central Province</option>
-              <option value="south">South Province</option>
-              <option value="southguest">South Guest Province</option>
-              <option value="uwa">Uwa Province</option>
-              <option value="Northcenter">North center Province</option>
-            </Select>
-          </div>
-          <div>
-            <Label value="District" />
-            <Select
-              type="text"
-              placeholder="District"
-              id="district"
-              onChange={handleChange}
+              onChange={handleProvinceChange}
+              value={selectedProvince}
             >
-              <option value=""> Select</option>
-              <option value="colombo">Colombo District</option>
-              <option value="kurunegala">Kurunrgala District</option>
-              <option value="kandy">Kandy District</option>
-              <option value="jaffna">Jaffna District</option>
-              <option value="anuradhapura">Anuradhapura District</option>
-              <option value="polonnaruwa">Polonnaruwa District</option>
-              <option value="mathale">Mathale District</option>
-              <option value="nuwaraeliya">Nuwara Eliya District</option>
-              <option value="puththalama">Puththalama District</option>
-              <option value="rathnapura">Rathnapura District</option>
-              <option value="badulla">Badulla District</option>
-              <option value="monaragala">Monaragala District</option>
-              <option value="kaluthara">Kaluthara District</option>
-              <option value="galle">Galle District</option>
-              <option value="mathara">Mathara District</option>
-              <option value="hambanthota">Hambanthota District</option>
-              <option value="ampara">Ampara District</option>
-              <option value="thrincomale">Thrincomale District</option>
-              <option value="baticolo">Batocolo District</option>
-              <option value="kilinochchi">Kilinochchi District</option>
-              <option value="mulathive">Mulathive District</option>
-              <option value="mannar">Mannaram District</option>
-              <option value="kegalle">Kegalle District</option>
+              <option value="">Select</option>
+              {Object.keys(provinceDistricts).map((province) => (
+                <option key={province} value={province}>
+                  {province.charAt(0).toUpperCase() + province.slice(1)}{" "}
+                  Province
+                </option>
+              ))}
             </Select>
           </div>
 
+          <div>
+            <label>District</label>
+            <Select
+              id="district"
+              value={selectedDistrict}
+              onChange={(e) => setSelectedDistrict(e.target.value)}
+              disabled={!selectedProvince}
+            >
+              <option value="">Select</option>
+              {selectedProvince &&
+                provinceDistricts[selectedProvince]?.map((district) => (
+                  <option key={district} value={district.toLowerCase()}>
+                    {district} District
+                  </option>
+                ))}
+            </Select>
+          </div>
           <div>
             <Label value="Town " />
             <TextInput
@@ -189,7 +194,7 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          
+
           <div>
             <Label value="Your password" />
             <div className="relative">
@@ -267,7 +272,7 @@ export default function SignUp() {
             Sign In
           </Link>
         </div>
-        <OAuthenticate/>
+        <OAuthenticate />
 
         <div className="text-red-600">
           {error && (

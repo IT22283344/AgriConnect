@@ -19,6 +19,7 @@ import {
   HiLogout,
   HiBookmarkAlt,
   HiOutlineBookmark,
+  HiOutlineGift,
 } from "react-icons/hi";
 import { HiBookmark, HiOutlineArchive } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
@@ -74,6 +75,21 @@ export default function DashSideBar() {
               Profile
             </Sidebar.Item>
           </Link>
+          {(currentUser?.isAdmin && currentUser?.role === "farmer") && (
+            <>
+              <Link to="/dashboard?tab=yourproduct" key="yourproduct">
+                <Sidebar.Item
+                  active={tab === "yourproduct"}
+                  icon={HiOutlineGift}
+                  as="div"
+                >
+                  Your Products
+                </Sidebar.Item>
+              </Link>
+
+              
+            </>
+          )}
 
           {(currentUser?.isAdmin) && (
             <>

@@ -19,11 +19,11 @@ export default function DashUsers() {
           Navigate("/");
         }
 
-        const res = await fetch("/api/user/getusers");
+        const res = await fetch(`/api/user/getusers?searchTerm=${searchTerm}`);
         const data = await res.json();
         console.log(data)
         if (res.ok) {
-          setUsers(data);
+          setUsers(data.users);
         }
       } catch (error) {
         console.log(error.message);
@@ -33,7 +33,10 @@ export default function DashUsers() {
     if (currentUser.isAdmin) {
       fetchs();
     }
-  }, []);
+    
+  }
+  
+  , [currentUser._id,searchTerm]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -76,15 +79,7 @@ export default function DashUsers() {
 
       {/* Radio Buttons */}
       <div className="flex justify-left items-center gap-4 mb-6 border border-gray-200 rounded-lg">
-        <label className="flex items-center p-3 ">
-          <input
-            type="radio"
-            value=""
-           
-            className="mr-2"
-          />
-          All
-        </label>
+     
 
         {/*Department wise filtering
         {departments.map((department) => (
@@ -103,16 +98,19 @@ export default function DashUsers() {
 
       {/* Staff Table */}
       {(currentUser?.isAdmin) && users.length > 0 ? (
-        <Table hoverable className="shadow-md">
-          <Table.Head>
+        <Table hoverable className="shadow-sm">
+          <Table.Head >
+            <Table.HeadCell>ID</Table.HeadCell>
             <Table.HeadCell>Name</Table.HeadCell>
             <Table.HeadCell>Email</Table.HeadCell>
-            <Table.HeadCell>Department</Table.HeadCell>
             <Table.HeadCell>Contact Number</Table.HeadCell>
-            <Table.HeadCell>Position</Table.HeadCell>
+            <Table.HeadCell>Address</Table.HeadCell>
+            <Table.HeadCell>User Type</Table.HeadCell>
+            <Table.HeadCell>Province</Table.HeadCell>
+            <Table.HeadCell>Distrct</Table.HeadCell>
+            <Table.HeadCell>Town</Table.HeadCell>
             <Table.HeadCell>Delete</Table.HeadCell>
-            <Table.HeadCell>Send Mail</Table.HeadCell>
-            <Table.HeadCell>Edit</Table.HeadCell>
+            <Table.HeadCell>Send mail</Table.HeadCell>
           </Table.Head>
           {users.filter((member) => {
             return (
@@ -125,17 +123,15 @@ export default function DashUsers() {
           }).map((member) => (
             <Table.Body className="divide-y" key={member._id}>
               <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Cell>{member.userId}</Table.Cell>
                 <Table.Cell>{member.username}</Table.Cell>
                 <Table.Cell>{member.email}</Table.Cell>
-                <Table.Cell>{member.adress}</Table.Cell>
                 <Table.Cell>{member.mobile}</Table.Cell>
+                <Table.Cell>{member.adress}</Table.Cell>
                 <Table.Cell>{member.role}</Table.Cell>
                 <Table.Cell>{member.province}</Table.Cell>
                 <Table.Cell>{member.district}</Table.Cell>
                 <Table.Cell>{member.town}</Table.Cell>
-
-                
-
                 <Table.Cell>
                   <span
                     className="font-medium text-red-500 hover:underline cursor-pointer"
