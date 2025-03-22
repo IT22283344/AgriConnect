@@ -19,7 +19,7 @@ import {
   updateUserStart,
   updateUserSuccess,
 } from "../redux/user/userSlice";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { HiOutlineExclamationCircle, HiPencil } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
 export default function DashProfile() {
@@ -91,6 +91,7 @@ export default function DashProfile() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -151,11 +152,13 @@ export default function DashProfile() {
 
   return (
     <>
-      <div className="max-w-6xl m-6 border rounded-lg shadow-lg mx-auto p-6 w-full">
-        <h1 className="my-7 text-center font-Lavish un text-3xl">Profile (<span>{currentUser.role.toUpperCase()})</span> </h1>
+      <div className="max-w-6xl m-6 border  rounded-lg shadow-lg mx-auto p-6 w-full">
+        <h1 className="my-7 text-center font-Lavish un text-3xl">
+          Profile (<span>{currentUser.role.toUpperCase()})</span>{" "}
+        </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-row ">
-            <div className="w-1/4 items-center mt-8">
+          <div className="flex flex-row gap-8">
+            <div className="w-1/3 items-center justify-center ml-8 mt-3 border rounded-lg p-4">
               <input
                 type="file"
                 accept="image/*"
@@ -164,7 +167,7 @@ export default function DashProfile() {
                 hidden
               />
               <div
-                className="relative w-48 h-48 self-center cursor-pointer shadow-md overflow-hidden rounded-full"
+                className="relative w-40 h-40 self-center cursor-pointer shadow-md ml-16 overflow-hidden rounded-full"
                 onClick={() => filePickerRef.current.click()}
               >
                 {imagePercent > 0 && imagePercent < 100 && (
@@ -194,19 +197,78 @@ export default function DashProfile() {
                   aria-label="User Profile Image"
                 />
               </div>
+              <p className="text-red-500 text-xs ml-16">
+                <HiPencil onClick={() => filePickerRef.current.click()} className="text-xl" />
+                Change your Profile Picture!
+              </p>
+
+              {currentUser?.role === "farmer" && (
+                <>
+                  <Link to="">
+                    <Button
+                      type="button"
+                      className="w-full mt-8  text-black bg-slate-400 "
+                      outline
+                    >
+                      Add Listing
+                    </Button>
+                  </Link>
+                </>
+              )}
+              <div className="text-red-500 font-semibold flex justify-between mt-5">
+                <span
+                  onClick={() => setShowModel(true)}
+                  className="cursor-pointer"
+                >
+                  Delete Account
+                </span>
+                <span onClick={handleSignOut} className="cursor-pointer">
+                  Sign Out
+                </span>
+              </div>
+
+              {/*currentUser?.role === "wholeseller" && (
+                <>
+                  <Link to="">
+                    <Button
+                      type="button"
+                      className="w-full , text-black bg-slate-400 "
+                      outline
+                    >
+                      Add Request
+                    </Button>
+                  </Link>
+                </>
+               )*/}
               {imageError && <Alert color="failure">{imageError}</Alert>}
             </div>
             <div className="w-3/4 flex flex-col ">
-              <div className="flex flex-col">
-                <span className="text-yellow-500 text-4xl font-Lavish">
-                  Hello {currentUser.username}!
-                </span>
-                <span className="text-2xl font-Lavish">
-                  Welcome to Agri Connect!{" "}
-                </span>{" "}
+              <div className="flex flex-row justify-between">
+                <div className="flex flex-col">
+                  <span className="text-yellow-500 text-4xl font-Lavish">
+                    Hello {currentUser.username}!
+                  </span>
+                  <span className="text-2xl font-Lavish">
+                    Welcome to Agri Connect!{" "}
+                  </span>{" "}
+                </div>
+                <Button className="text-white bg-lime-700 items-center">
+                  Help Desk !
+                </Button>
               </div>
-
               <div className="m-2 p-2">
+                <div className="M-3 p-1">
+                  <Label>USERID</Label>
+                  <TextInput
+                    type="text"
+                    id="userId"
+                    placeholder="USERID"
+                    disabled
+                    defaultValue={currentUser.userId}
+                    onChange={handleChange}
+                    className="opacity-85"
+                  />
+                </div>
                 <div className="M-3 p-1">
                   <Label>USERNAME</Label>
                   <TextInput
@@ -233,9 +295,11 @@ export default function DashProfile() {
                   <TextInput
                     type="email"
                     id="email"
+                    disabled
                     placeholder="email"
                     defaultValue={currentUser.email}
                     onChange={handleChange}
+                    className="opacity-85"
                   />
                 </div>
                 <div className="M-3 p-1">
@@ -249,38 +313,38 @@ export default function DashProfile() {
                   />
                 </div>
                 <div className="flex flex-row gap-2">
-                <div className="M-3 p-1 w-1/3">
-                  <Label>PROVINCE</Label>
-                  <TextInput
-                    type="text"
-                    id="province"
-                    placeholder="Province"
-                    defaultValue={currentUser.province}
-                    onChange={handleChange}
-                  />
+                  <div className="M-3 p-1 w-1/3">
+                    <Label>PROVINCE</Label>
+                    <TextInput
+                      type="text"
+                      id="province"
+                      placeholder="Province"
+                      defaultValue={currentUser.province}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="M-3 p-1  w-1/3">
+                    <Label>DISTRICT</Label>
+                    <TextInput
+                      type="text"
+                      id="district"
+                      placeholder="District"
+                      defaultValue={currentUser.district}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="M-3 p-1  w-1/3">
+                    <Label>TOWN</Label>
+                    <TextInput
+                      type="text"
+                      id="town"
+                      placeholder="Town"
+                      defaultValue={currentUser.town}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
-                <div className="M-3 p-1  w-1/3">
-                  <Label>DISTRICT</Label>
-                  <TextInput
-                    type="text"
-                    id="district"
-                    placeholder="District"
-                    defaultValue={currentUser.district}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="M-3 p-1  w-1/3">
-                  <Label>TOWN</Label>
-                  <TextInput
-                    type="text"
-                    id="town"
-                    placeholder="Town"
-                    defaultValue={currentUser.town}
-                    onChange={handleChange}
-                  />
-                </div>
-                </div>
-              
+
                 <div className="M-3 p-1">
                   <Label>PASSWORD</Label>
 
@@ -354,14 +418,7 @@ export default function DashProfile() {
             </div>
           </div>
         </form>
-        <div className="text-red-500 flex justify-between mt-5">
-          <span onClick={() => setShowModel(true)} className="cursor-pointer">
-            Delete Account
-          </span>
-          <span onClick={handleSignOut} className="cursor-pointer">
-            Sign Out
-          </span>
-        </div>
+
         <div className="text-green-600">
           {updateSuccess && (
             <Alert color="success" className="mt-5">
