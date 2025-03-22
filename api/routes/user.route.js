@@ -16,7 +16,7 @@ router.get('/getusers', verifyToken, getUsers);
 router.post('/forgetpassword',forgetpassword);
 router.get('/resetpassword/:id/:token',resetpassword);
 router.post('/updateResetPassword/:id/:token',updateResetPassword);
-router.get('/:userId', getUser);
+router.get('/getUser/:userId', getUser);
 
 
 export default router;
