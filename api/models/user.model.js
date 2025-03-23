@@ -45,12 +45,10 @@ const userSchema = new mongoose.Schema({
 
     district:{
         type:String,
-        required:true,
     },
 
     town:{
         type:String,
-        required:true,
     },
 
     role:{
