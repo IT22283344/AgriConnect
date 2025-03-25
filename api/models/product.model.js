@@ -29,11 +29,31 @@ const productSchema = new mongoose.Schema({
         required: true,
         enum: ['vegetables', 'fruits', 'meat', 'grains', 'other']
     },
-    farmer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+    discountedPrice:{
+        type:Number,
+        required:true,
     },
+    offer:{
+        type:Boolean,
+    },
+    userId: {
+        type: String,
+        ref: 'User',
+    },
+    province:{
+        type:String,
+        ref: 'User',
+    },
+
+    district:{
+        type:String,
+        ref: 'User',
+    },
+    town:{
+        type:String,
+        ref: 'User',
+    },
+
     images: [{
         type: String
     }],
@@ -43,7 +63,6 @@ const productSchema = new mongoose.Schema({
     },
     productSlug: {
         type: String,  // ✅ Fixed the missing type
-        required: true,
         unique: true,
     }
 }, {

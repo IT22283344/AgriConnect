@@ -75,15 +75,15 @@ export default function DashSideBar() {
               Profile
             </Sidebar.Item>
           </Link>
-          {(currentUser?.isAdmin && currentUser?.role === "farmer") && (
+          {(currentUser?.isAdmin || currentUser?.role === "farmer") && (
             <>
-              <Link to="/dashboard?tab=yourproduct" key="yourproduct">
+              <Link to="/dashboard?tab=myproducts" key="myproducts">
                 <Sidebar.Item
-                  active={tab === "yourproduct"}
+                  active={tab === "myproducts"}
                   icon={HiOutlineGift}
                   as="div"
                 >
-                  Your Products
+                  My Products
                 </Sidebar.Item>
               </Link>
 

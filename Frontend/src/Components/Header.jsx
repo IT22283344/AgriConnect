@@ -55,7 +55,7 @@ export default function Header() {
             Home
           </NavLink>
           <NavLink
-            to="/category"
+            to="/productpage"
             className={({ isActive }) =>
               isActive ? "nav-link-active" : "nav-link"
             }

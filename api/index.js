@@ -5,12 +5,8 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
-<<<<<<< HEAD
 import reviewRoute from "./routes/review.route.js";
-
-=======
 import productRoute from "./routes/product.route.js";
->>>>>>> c1d07d3 (product controllers,models,routes created)
 
 dotenv.config();
 
@@ -36,15 +32,10 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-<<<<<<< HEAD
 app.use("/api/auth",authRoute);
 app.use("/api/user",userRoute);
 app.use("/api/reviews",reviewRoute);
-=======
-app.use("/api/auth", authRoute);
-app.use("/api/user", userRoute);
 app.use("/api/product", productRoute);
->>>>>>> c1d07d3 (product controllers,models,routes created)
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

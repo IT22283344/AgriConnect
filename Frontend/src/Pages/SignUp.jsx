@@ -11,7 +11,17 @@ import { Link, useNavigate } from "react-router-dom";
 import OAuthenticate from "../Components/OAuthenticate";
 
 export default function SignUp() {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    mobile: "",
+    adress: "",
+    province: "",
+    district: "",
+    town: "",
+    role: "",
+  });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -79,10 +89,19 @@ export default function SignUp() {
   };
 
   const handleProvinceChange = (e) => {
-    setSelectedProvince(e.target.value);
+    const selectedProvince = e.target.value;
+    setSelectedProvince(selectedProvince);
+    setFormData({ ...formData, province: selectedProvince }); // Update formData
     setSelectedDistrict(""); // Reset district when province changes
   };
 
+  const handleDistrictChange = (e) => {
+    const selectedDistrict = e.target.value;
+    setSelectedDistrict(selectedDistrict);
+    setFormData({ ...formData, district: selectedDistrict }); // Update formData
+  };
+
+  console.log(formData);
   return (
     <div
       className="min-h-screen flex  justify-end"
@@ -173,7 +192,7 @@ export default function SignUp() {
             <Select
               id="district"
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
+              onChange={handleDistrictChange}
               disabled={!selectedProvince}
             >
               <option value="">Select</option>
