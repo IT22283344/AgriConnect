@@ -3,7 +3,7 @@ import { errorHandler } from "./error.js";
 
 // Middleware to verify the JWT token
 export const verifyToken = (req, res, next) => {
-    const token = req.cookies.access_token; // Corrected typo: 'acess_token' -> 'access_token'
+    const token = req.cookies.acess_token; // Corrected typo: 'acess_token' -> 'access_token'
 
     if (!token) {
         return next(errorHandler(401, 'You are not authenticated'));

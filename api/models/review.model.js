@@ -28,6 +28,8 @@ const reviewSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
+        required:true,
+        mib:1,max:5,
         
     },
     numberofrating: {

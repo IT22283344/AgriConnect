@@ -1,79 +1,135 @@
 import Product from '../models/product.model.js'
+import { errorHandler } from "../utils/error.js";
 
 export const addProduct = async (req, res, next) => {
     try {
+      const { productname,userId,district,province,town} = req.body;
       if (!req.user.role==="farmer") {
         return next(errorHandler(403, 'You are not allowed to add product'));
       }
-      if (!req.body.productname || !req.body.unit || !req.body.category || !req.body.price || !req.body.quantity) {
+      if (!req.body.productname || !req.body.unit || !req.body.category || !req.body.price || !req.body.quantity ) {
         return next(errorHandler(400, 'Please provide all required fields'));
       }
-  
-      const productSlug = req.body.productname.split(' ').join('-').toLowerCase().replace(/[^a-zA-Z0-9-]/g, '');
+      
       const newProduct = new Product({
         ...req.body,
-        productSlug,
-        farmer: req.user._id
+        productname,
+        userId,
+        province,
+        district,
+        town,
 
       });
-  
       const savedProduct = await newProduct.save();
-      res.status(201).json(savedProduct);
-    } catch (error) {
-      next(error);
-    }
-  }
-  export const getProducts = async (req, res, next) => {
-    try {
-      const { productSlug, searchTerm, page = 1, limit = 9, category, priceRange } = req.query;
-      const queryOptions = {};
-  
-      if (productSlug) {
-        queryOptions.productSlug = productSlug;
-      }
-  
-      if (searchTerm) {
-        queryOptions.title = { $regex: searchTerm, $options: 'i' };
-      }
-  
-      if (category) {
-        queryOptions.category = category;
-      }
-  
-      if (priceRange) {
-        const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-        queryOptions.price = { $gte: minPrice, $lte: maxPrice };
-      }
-  
-      const totalProducts = await Product.countDocuments(queryOptions);
-      const products = await Product.find(queryOptions)
-        .skip((page - 1) * limit)
-        .limit(Number(limit));
-  
-      res.status(200).json({
-        products,
-        totalProducts,
-        totalPages: Math.ceil(totalProducts / limit),
-        currentPage: Number(page),
-      });
+      const productSlug = `${productname.split(" ")
+        .join("-")
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9-]/g, "")}-${savedProduct._id}`;
+
+      savedProduct.productSlug = productSlug;
+      const updatedProduct = await savedProduct.save();
+
+      res.status(201).json(updatedProduct);
     } catch (error) {
       next(error);
     }
   };
+  
+//get product dashboard
+export const getProducts = async (req, res, next) => {
+  try {
+    const { productSlug, searchTerm, page = 1, limit = 9, category, price } = req.query;
+    const queryOptions = {};
 
-
-export const getProductById = async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id)
-            .populate('farmer', 'name email phone');
-        if (product) {
-            res.json(product);
-        } else {
-            res.status(404).json({ message: 'Product not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (productSlug) {
+      queryOptions.productSlug = productSlug;
     }
+
+    if (searchTerm) {
+      queryOptions.productname = { $regex: searchTerm, $options: 'i' };
+    }
+
+    if (category) {
+      queryOptions.category = category;
+    }
+
+    if (price) {
+      const [minPrice, maxPrice] = price.split('-').map(Number);
+      queryOptions.price = { $gte: minPrice, $lte: maxPrice };
+    }
+
+    // Fetch filtered products
+    const totalProducts = await Product.countDocuments(queryOptions);
+    const products = await Product.find(queryOptions)
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    // Calculate average price per district
+    const averagePrices = await Product.aggregate([
+      { $match: queryOptions }, // Apply filters
+      { 
+        $group: { 
+          _id: "$district", // Group by district
+          averagePrice: { $avg: "$price" } // Calculate average price
+        } 
+      },
+      { $sort: { _id: 1 } } // Sort by district name
+    ]);
+
+    res.status(200).json({
+      products,
+      totalProducts,
+      totalPages: Math.ceil(totalProducts / limit),
+      currentPage: Number(page),
+      averagePrices // Send average prices per district
+    });
+    console.log(averagePrices)
+  } catch (error) {
+    next(error);
+  }
+};
+
+  //get product into product listing page
+  export const getProductListings = async (req, res, next) => {
+    try {
+      const limit = parseInt(req.query.limit) || 9;
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      let category = req.query.category;
+  
+      if (!category || category === "all") {
+        category = { $in: ["vegetables", "fruits", "grains", "other"] };
+      }
+  
+      const searchTerm = req.query.searchTerm || "";
+      const sort = req.query.sort || "createdAt";
+      const order = req.query.order === "asc" ? 1 : -1;
+  
+      const products = await Product.find({
+        productname: { $regex: searchTerm, $options: "i" },
+        category,
+      })
+        .sort({ [sort]: order })
+        .limit(limit)
+        .skip(startIndex);
+  
+      return res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  export const getProductById = async(req,res,next) => {
+    try{
+        const products = await Product.findById(req.params.id);
+        if(!products){
+            return next(errorHandler(404,'No product not found'));
+        }
+        res.status(200).json(products);
+
+    }catch(error){
+        next(error);
+    }
+
 };
 
 export const updateProduct = async (req, res) => {
