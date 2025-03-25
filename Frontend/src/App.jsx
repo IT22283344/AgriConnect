@@ -8,6 +8,9 @@ import PrivateRoute from './Components/PrivateRoute';
 import OnlyAdminPrivateRoute from './Components/OnlyAdminPrivateRoute';
 import ScrollToTop from './Components/ScrollTop';
 import Support from './Pages/Support';
+import AddProduct from './Pages/AddProduct';
+import Prodcutpage from './Pages/Productpage';
+import ProductView from './Pages/ProductView';
 
 
 export default function App() {
@@ -22,8 +25,10 @@ export default function App() {
         <Route path="/support/:slug" element={<Support/>} />
         <Route element={<PrivateRoute />} />
         <Route path="/dashboard" element={<DashBoard />} />
-         
-       
+        <Route path='/addproduct' element={<AddProduct/>}/>
+        <Route path='/productpage'element={<Prodcutpage/>}/>
+        <Route path='/productview/:productId'element={<ProductView/>}/>
+
 
         <Route element={<OnlyAdminPrivateRoute />}></Route>
 

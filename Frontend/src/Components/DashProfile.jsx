@@ -204,7 +204,7 @@ export default function DashProfile() {
 
               {currentUser?.role === "farmer" && (
                 <>
-                  <Link to="">
+                  <Link to="/addproduct">
                     <Button
                       type="button"
                       className="w-full mt-8  text-black bg-slate-400 "
