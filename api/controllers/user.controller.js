@@ -185,7 +185,7 @@ export const forgetpassword = async (req, res, next) => {
 
   
     user.verifytoken = token;
-    
+
     await user.save();
     
 

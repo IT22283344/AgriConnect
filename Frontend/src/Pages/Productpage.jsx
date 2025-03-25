@@ -140,7 +140,7 @@ export default function ProductPage() {
           {!loading && products.length === 0 && <p>No Products Found!</p>}
           {loading && (
             <div className="flex flex-col items-center justify-center w-full my-6 animate-fadeIn">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-500 border-solid"></div>
+              <div className="animate-spin rounded-full h-12 w-6 border-t-4 border-green-500 border-solid"></div>
               <p className="mt-2 text-sm text-gray-600">Fetching Products...</p>
             </div>
           )}

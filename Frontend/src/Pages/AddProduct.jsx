@@ -29,7 +29,6 @@ export default function AddProduct() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
   const [imageUploadError, setImageUploadError] = useState(false);
   console.log(formData);
 

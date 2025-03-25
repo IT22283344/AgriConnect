@@ -5,20 +5,25 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    userrefId: {
+        type: String,
+        required: true
+    },
     username: {
         type: String,
         required: true
        
     },
-    reviewId:{
+    productId:{
         type:String,
     },
     
-    title: {
+    productname: {
         type: String,
-       
+        required:true
     },
-    productId: {
+    farmerId: {
         type: String,
         required:true
     },
@@ -32,10 +37,7 @@ const reviewSchema = new mongoose.Schema({
         mib:1,max:5,
         
     },
-    numberofrating: {
-        type: Number,
-        default: 0
-    },
+ 
     reviewimage:{
         type:String,
         default:"https://www.contentviewspro.com/wp-content/uploads/2017/07/default_image.png"
