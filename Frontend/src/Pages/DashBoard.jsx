@@ -5,7 +5,7 @@ import DashProfile from "../Components/DashProfile";
 import DashUsers from "../Components/DashUsers";
 import DashMyProducts from "../Components/DashMyProducts";
 import SendMail from "./sendMail";
-import { useNavigate,useParams } from "react-router-dom";
+
 
 
 export default function DashBoard() {
