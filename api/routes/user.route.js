@@ -1,6 +1,6 @@
 import express  from "express";
 import { verifyToken } from "../utils/verifyUser.js";
-import {  deleteUser, forgetpassword, getAdmins, getFarmers, getUser, getUsers, getWholesellers, resetpassword, signout, test, updateResetPassword, updateUser } from "../controllers/user.controller.js";
+import {  deleteUser, forgetpassword, getAdmins, getFarmers, getUser, getUsers, getWholesellers, resetpassword, signout, test, updateResetPassword, updateUser, weatherData } from "../controllers/user.controller.js";
 
 
 const router = express.Router();
@@ -18,5 +18,6 @@ router.get('/resetpassword/:id/:token',resetpassword);
 router.post('/updateResetPassword/:id/:token',updateResetPassword);
 router.get('/getUser/:userId', getUser);
 
+router.get('/weather/forecast', weatherData);
 
 export default router;

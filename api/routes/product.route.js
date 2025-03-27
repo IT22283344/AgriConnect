@@ -15,6 +15,6 @@ router.get("/getProducts", getProducts);
 router.get('/getproductlists', getProductListings);
 router.get('/getproductlists/:id', getProductById);
 router.put("/updateproduct/:productId/:farmer", verifyToken, updateProduct);
-router.delete("/deleteproduct/:productId", verifyToken, deleteProduct);
+router.delete("/deleteproduct/:productId/:userId", verifyToken, deleteProduct);
 
 export default router;

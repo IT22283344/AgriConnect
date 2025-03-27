@@ -14,12 +14,12 @@ export default function DashMyProducts() {
       try {
         const res = await fetch(`/api/product/getproducts`);
         const data = await res.json();
+        console.log(data)
         if (res.ok) {
           // Filter the bookings based on the current user's email
           const userProducts = data.products.filter(
             (product) => product.userId === currentUser.userId
           );
-
           // Update state
           setUserProducts(userProducts);
         }
@@ -38,7 +38,7 @@ export default function DashMyProducts() {
     setShowModel(false);
     try {
       const res = await fetch(
-        `/api/products/deleteproduct/${productIdToDelete}/${currentUser.userId}`,
+        `/api/product/deleteproduct/${productIdToDelete}/${currentUser.userId}`,
         {
           method: "DELETE",
         }
