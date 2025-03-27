@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { HomeHero } from '../Components/HomeHero'
 import HeroSection from '../Components/HeroSection'
 import Footer from '../Components/Footer'
