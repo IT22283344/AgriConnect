@@ -62,7 +62,7 @@ const productSchema = new mongoose.Schema({
         default: true
     },
     productSlug: {
-        type: String,  // ✅ Fixed the missing type
+        type: String, 
         unique: true,
     }
 }, {

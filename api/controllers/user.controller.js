@@ -302,3 +302,25 @@ export const getWholesellers = async (req, res, next) => {
   }
 };
 
+
+const API_KEY = "ecc4f377165b4aa99f681229252503"; // Replace with your actual API key
+const BASE_URL = "https://api.weatherapi.com/v1/forecast.json";
+
+export const weatherData =async (req, res) => {
+  const { location,days } = req.query; // Get location from query params
+  if (!location) return res.status(400).json({ error: "Location is required" });
+
+  try {
+    const response = await fetch(`${BASE_URL}?key=${API_KEY}&q=${location}&days=${days || 7}`);
+    const data = await response.json();
+      console.log(data)
+      if (response.ok) {
+          res.json(data); // Send data to frontend
+      } else {
+          res.status(response.status).json({ error: data.error.message });
+      }
+  } catch (error) {
+      console.error("Error fetching weather data:", error);
+      res.status(500).json({ error: "Failed to fetch weather data" });
+  }
+};

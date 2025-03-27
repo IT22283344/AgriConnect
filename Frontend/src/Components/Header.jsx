@@ -30,7 +30,7 @@ export default function Header() {
   console.log(currentUser);
 
   return (
-    <Navbar className="sticky top-0 z-50 bg-gradient-to-r from-green-700 to-green-900 text-white p-4 shadow-lg ">
+    <Navbar className="sticky top-0 z-50 bg-gradient-to-br from-lime-700 to-green-900 text-white p-4 shadow-lg ">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo & Brand Name */}
         <Link to="/" className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default function Header() {
           >
             Category
           </NavLink>
-          {currentUser ? (
+          {currentUser?.role === "farmer" ? (
             <NavLink
               to={`/support/${currentUser.slug}`}
               className={({ isActive }) =>
