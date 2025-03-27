@@ -28,24 +28,21 @@ export default function ProductCard({ product }) {
             <p className="truncate">{product.quantity} available</p>
           </div>
 
-          <p className="text-sm text-gray-600 line-clamp-2">
-            {product.description}
-          </p>
 
           <div className="flex justify-between items-center mt-2">
             <p className="text-lg font-bold text-green-700">
-              ${product.price?.toLocaleString("en-US") || product.price?.toLocaleString("en-US")}
+              Rs.{product.price?.toLocaleString("en-US") || product.price?.toLocaleString("en-US")}
             </p>
             {product.discountedPrice ? (
               <p className="text-sm line-through text-gray-500">
-                ${product.discountedPrice?.toLocaleString("en-US")}
+                Rs.{product.discountedPrice?.toLocaleString("en-US")}
               </p>
             ):( <p className="text-sm line-through text-gray-500">
-                ${product.discountedPrice?.toLocaleString("en-US")}
+                Rs.{product.discountedPrice?.toLocaleString("en-US")}
               </p>)}
           </div>
 
-          <button className="w-full mt-3 bg-green-600 text-white font-semibold py-2 rounded-lg transition-all hover:bg-green-700">
+          <button className="w-full mt-3 bg-lime-700 text-white font-semibold py-2 rounded-lg transition-all hover:bg-lime-800">
             View Details
           </button>
         </div>

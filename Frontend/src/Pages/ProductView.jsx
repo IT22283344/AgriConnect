@@ -221,9 +221,9 @@ export default function ProductView() {
 
           {/* Right Side - Product Details */}
           <div className="space-y-4">
-          <span className="px-4 py-2 bg-red-600 text-white rounded-md">
-                {product.category}
-              </span>
+            <span className="px-4 py-2 bg-red-600 text-white rounded-md">
+              {product.category}
+            </span>
             <h1 className="text-3xl font-bold text-gray-900">
               {product.productname}
             </h1>
@@ -233,7 +233,6 @@ export default function ProductView() {
             <p className="text-gray-700">{product.description}</p>
 
             <div className="flex items-center space-x-4">
-            
               {product.offer && (
                 <span className="px-4 py-2 bg-green-600 text-white rounded-md">
                   ${+product.price - +product.discountedPrice} OFF
@@ -241,9 +240,10 @@ export default function ProductView() {
               )}
             </div>
             <h1 className="text-xl font-semibold text-gray-900">
-              Available stoks :{product.quantity}{product.unit}
+              Available stocks :{product.quantity}
+              {product.unit}
             </h1>
-
+            <div className="flex flex-row gap-6">
             <button
               className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition"
               onClick={() => {
@@ -254,6 +254,9 @@ export default function ProductView() {
             >
               Share Product
             </button>
+            <button className="mt-4 px-6 py-3 bg-red-600 text-white font-medium rounded-lg shadow-md hover:bg-red-700 transition">Add to cart</button>
+            </div>  
+           
             {copied && <p className="text-green-500 text-sm">Link copied!</p>}
           </div>
           <StarRatingDisplay
@@ -268,8 +271,8 @@ export default function ProductView() {
       )}
 
       {/* Reviews Section */}
-      <div className="mt-12">
-        {/*currentUser?.role === "wholeseller" && <ReviewForm />*/}
+      <div className="mt-6">
+        {currentUser?.role === "wholeseller" && <ReviewForm />}
         <ReviewDisplay productId={product?._id} />
       </div>
     </main>

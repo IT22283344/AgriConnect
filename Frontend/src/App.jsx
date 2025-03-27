@@ -11,6 +11,7 @@ import Support from './Pages/Support';
 import AddProduct from './Pages/AddProduct';
 import Prodcutpage from './Pages/Productpage';
 import ProductView from './Pages/ProductView';
+import { Footer } from 'flowbite-react';
 
 
 export default function App() {
@@ -37,7 +38,7 @@ export default function App() {
       
 
       </Routes>
-
+    <Footer/>
     </BrowserRouter>
   );
 }
