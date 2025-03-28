@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
 
-export default function ProductCard({ product }) {
+export default function ProductListing({ product }) {
   return (
     <div className="bg-white shadow-md rounded-xl overflow-hidden w-full sm:w-[320px] transition-all duration-300 hover:shadow-xl hover:scale-105">
       <Link to={`/productview/${product._id}`} className="block">

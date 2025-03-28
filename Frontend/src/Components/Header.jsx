@@ -81,10 +81,19 @@ export default function Header() {
               Support
             </NavLink>
           )}
+
         </div>
 
         {/* User Profile & Actions */}
         <div className="flex items-center space-x-4">
+        {currentUser && (
+              <Link to="/cart">
+                <div className="flex relative">
+                  <HiShoppingBag className="mr-1 text-white" style={{ fontSize: '24px' }} />
+                </div>
+              </Link>
+            )}
+
           {currentUser ? (
             <Dropdown
               arrowIcon={false}

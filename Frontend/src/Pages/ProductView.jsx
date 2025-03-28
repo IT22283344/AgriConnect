@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
@@ -10,6 +10,8 @@ import ReviewDisplay from "../Components/ReviewsDisplay";
 import ReviewForm from "../Components/ReviewForm";
 import MODRating from "../Components/ModRating";
 import { HiStar } from "react-icons/hi";
+import { addToCart } from '../redux/cart/cartSlice';
+
 
 export default function ProductView() {
   SwiperCore.use([Navigation]);
@@ -25,7 +27,10 @@ export default function ProductView() {
   const [Twostar, setTwostar] = useState(0);
   const [Onestar, setOnestar] = useState(0);
   const [moderateRating, setmoderateRating] = useState(0);
-
+  const [notification, setNotification] = useState({ visible: false, message: '' });
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.currentUser);
+  
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -51,6 +56,23 @@ export default function ProductView() {
     };
     fetchProduct();
   }, [params.productId]);
+
+  const handleAddToCart = (product) => {
+    if (user) {
+      dispatch(addToCart({ product, userId: user.id }));
+      showNotification("Product added to the cart");
+    } else {
+      console.log("User not logged in");
+    }
+  };
+
+  const showNotification = (message) => {
+    setNotification({ visible: true, message });
+    setTimeout(() => {
+      setNotification({ visible: false, message: '' });
+    }, 3000);
+  };
+
 
   const getModeratereviews = async (productId) => {
     try {
@@ -221,21 +243,43 @@ export default function ProductView() {
 
           {/* Right Side - Product Details */}
           <div className="space-y-4">
-            <span className="px-4 py-2 bg-red-600 text-white rounded-md">
-              {product.category}
-            </span>
+            <div className="flex flex-row justify-between">
+              <span className="px-4 py-2 bg-red-600 text-white rounded-md">
+                {product.category}
+              </span>
+
+              <div className="fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer">
+                <FaShare
+                  className="text-slate-500"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    setTimeout(() => {
+                      setCopied(false);
+                    }, 3000);
+                  }}
+                />
+              </div>
+
+              {copied && (
+                <p className="fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2">
+                  Link copied!
+                </p>
+              )}
+            </div>
+
             <h1 className="text-3xl font-bold text-gray-900">
               {product.productname}
             </h1>
             <p className="text-xl text-green-600 font-semibold">
-              $ {product.price.toLocaleString("en-US")}
+              Rs. {product.price.toLocaleString("en-US")}
             </p>
             <p className="text-gray-700">{product.description}</p>
 
             <div className="flex items-center space-x-4">
               {product.offer && (
                 <span className="px-4 py-2 bg-green-600 text-white rounded-md">
-                  ${+product.price - +product.discountedPrice} OFF
+                  Rs. {+product.price - +product.discountedPrice} OFF
                 </span>
               )}
             </div>
@@ -244,19 +288,24 @@ export default function ProductView() {
               {product.unit}
             </h1>
             <div className="flex flex-row gap-6">
-            <button
-              className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 3000);
-              }}
-            >
-              Share Product
-            </button>
-            <button className="mt-4 px-6 py-3 bg-red-600 text-white font-medium rounded-lg shadow-md hover:bg-red-700 transition">Add to cart</button>
-            </div>  
-           
+              <button
+                className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 3000);
+                }}
+              >
+                Share Product
+              </button>
+              <button
+                className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+                onClick={() => handleAddToCart(product)}
+              >
+                Add to Cart
+              </button>
+            </div>
+
             {copied && <p className="text-green-500 text-sm">Link copied!</p>}
           </div>
           <StarRatingDisplay
@@ -275,6 +324,12 @@ export default function ProductView() {
         {currentUser?.role === "wholeseller" && <ReviewForm />}
         <ReviewDisplay productId={product?._id} />
       </div>
+
+      {notification.visible && (
+        <div className="fixed bottom-4 right-4 bg-lime-700 text-white py-2 px-4 rounded-lg p-6">
+          {notification.message}
+        </div>
+      )}
     </main>
   );
 }

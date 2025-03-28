@@ -12,6 +12,8 @@ import AddProduct from './Pages/AddProduct';
 import Prodcutpage from './Pages/Productpage';
 import ProductView from './Pages/ProductView';
 import { Footer } from 'flowbite-react';
+import Cart from './Components/Cart';
+import OrderSummary from './Pages/OrderSummary';
 
 
 export default function App() {
@@ -30,6 +32,8 @@ export default function App() {
         <Route path='/productpage'element={<Prodcutpage/>}/>
         <Route path='/productview/:productId'element={<ProductView/>}/>
 
+        <Route path='/cart'element={<Cart/>}/>
+        <Route path='/ordersummary'element={<OrderSummary/>}/>
 
         <Route element={<OnlyAdminPrivateRoute />}></Route>
 
