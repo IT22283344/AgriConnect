@@ -15,6 +15,7 @@ export default function ProductPage() {
     category: "all",
     sort: "createdAt",
     order: "desc",
+    isNearby: false,
   });
   const { currentUser } = useSelector((state) => state.user);
 
@@ -24,12 +25,14 @@ export default function ProductPage() {
     const categoryFromUrl = urlParams.get("category");
     const sortFromUrl = urlParams.get("sort");
     const orderFromUrl = urlParams.get("order");
+    const isNearbyFromUrl = urlParams.get("isNearby") === "true";
 
     setSidebardata({
       searchTerm: searchTermFromUrl || "",
       category: categoryFromUrl || "all",
       sort: sortFromUrl || "createdAt",
       order: orderFromUrl || "desc",
+      isNearby: isNearbyFromUrl,
     });
 
     const fetchingProducts = async () => {
@@ -42,11 +45,20 @@ export default function ProductPage() {
         urlParams.set("district", currentUser.district);
       }
 
+      if (isNearbyFromUrl) {
+        urlParams.set("isNearby", "true");
+      }
+
       const searchQuery = urlParams.toString();
       const res = await fetch(`/api/product/getproductlists?${searchQuery}`);
-      const data = await res.json();
-      console.log(data);
-      // Prioritize products from the user's district
+      let data = await res.json();
+
+      if (isNearbyFromUrl && currentUser?.district) {
+        data = data.filter(
+          (product) => product.district === currentUser.district
+        );
+      }
+
       const sortedData = data.sort((a, b) => {
         if (
           a.district === currentUser?.district &&
@@ -59,28 +71,35 @@ export default function ProductPage() {
         ) {
           return 1;
         }
-        return 0; // Keep other products in their order
+        return 0;
       });
 
       setShowMore(data.length > 7);
-      setProducts(sortedData);
+      setProducts(data);
       setLoading(false);
     };
 
     fetchingProducts();
-  }, [location.search]);
+  }, [location.search, currentUser?.district]);
 
   const handleChange = (e) => {
     const { id, value, checked } = e.target;
+
     if (["all", "vegetables", "fruits", "grains", "other"].includes(id)) {
       setSidebardata({ ...sidebardata, category: id });
     }
+
     if (id === "searchTerm") {
       setSidebardata({ ...sidebardata, searchTerm: value });
     }
+
     if (id === "sort_order") {
       const [sort, order] = value.split("_");
       setSidebardata({ ...sidebardata, sort, order });
+    }
+
+    if (id === "nearbyMe") {
+      setSidebardata({ ...sidebardata, isNearby: checked });
     }
   };
 
@@ -91,9 +110,9 @@ export default function ProductPage() {
     urlParams.set("category", sidebardata.category);
     urlParams.set("sort", sidebardata.sort);
     urlParams.set("order", sidebardata.order);
+    urlParams.set("isNearby", sidebardata.isNearby);
     navigate(`/productpage?${urlParams.toString()}`);
   };
-
 
   const onShowMoreClick = async () => {
     const startIndex = products.length;
@@ -111,7 +130,6 @@ export default function ProductPage() {
     <div className="flex flex-col md:flex-row">
       <div className="p-6 w-full md:w-1/4 lg:w-1/5 bg-white shadow-lg rounded-lg border border-gray-200">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          {/* Search Bar */}
           <div className="flex flex-col">
             <label className="font-semibold text-gray-700">Search:</label>
             <input
@@ -124,7 +142,6 @@ export default function ProductPage() {
             />
           </div>
 
-          {/* Category Selection */}
           <div className="flex flex-col">
             <label className="font-semibold text-gray-700">Category:</label>
             <div className="flex flex-wrap gap-3 mt-2">
@@ -136,7 +153,7 @@ export default function ProductPage() {
                     sidebardata.category === cat
                       ? "bg-lime-600 text-white"
                       : "bg-gray-100 text-gray-700"
-                  }
+                  } 
                   hover:bg-lime-500 hover:text-white transition`}
                 >
                   <input
@@ -152,7 +169,6 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Sorting Options */}
           <div className="flex flex-col">
             <label className="font-semibold text-gray-700">Sort By:</label>
             <select
@@ -160,21 +176,32 @@ export default function ProductPage() {
               id="sort_order"
               className="border rounded-lg p-3 mt-1 text-gray-800 focus:ring-2 focus:ring-lime-100 outline-none transition"
             >
-              <option value="price_desc"> Price: High to Low</option>
-              <option value="price_asc"> Price: Low to High</option>
               <option value="createdAt_desc"> Latest</option>
               <option value="createdAt_asc"> Oldest</option>
+              <option value="price_desc"> Price: High to Low</option>
+              <option value="price_asc"> Price: Low to High</option>
             </select>
           </div>
 
-          {/* Buttons */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="nearbyMe"
+              checked={sidebardata.isNearby}
+              onChange={handleChange}
+            />
+            <label htmlFor="nearbyMe" className="font-semibold text-gray-700">
+              Nearby Me
+            </label>
+          </div>
+
           <div className="flex flex-col gap-2">
             <button className="bg-lime-700 text-white font-semibold py-3 rounded-lg hover:bg-lime-800 transition">
               Search
             </button>
             <button
               type="button"
-             // onClick={clearFilters}
+              // onClick={clearFilters}
               className="bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition"
             >
               Clear Filters
@@ -190,16 +217,11 @@ export default function ProductPage() {
 
         {loading && (
           <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-80">
-            <div className="flex flex-col items-center gap-3">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-4 border-lime-600 border-solid"></div>
-              <p className="text-lg font-semibold text-gray-700">
-                Fetching Products...
-              </p>
-            </div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-lime-600"></div>
           </div>
         )}
 
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {!loading && products.length === 0 && (
             <p className="text-center text-gray-500 w-full">
               No Products Found!
@@ -212,12 +234,12 @@ export default function ProductPage() {
         </div>
 
         {showMore && (
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-4">
             <button
               onClick={onShowMoreClick}
-              className="text-green-700 text-lg border border-lime-700 rounded-2xl px-6 py-2 transition-all hover:bg-lime-700 hover:text-white"
+              className="bg-lime-700 text-white font-semibold py-2 px-8 rounded-lg hover:bg-lime-800 transition"
             >
-              Show more items
+              Show More ...
             </button>
           </div>
         )}
