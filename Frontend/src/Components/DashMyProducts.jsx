@@ -12,16 +12,13 @@ export default function DashMyProducts() {
   useEffect(() => {
     const fetchMyProducts = async () => {
       try {
-        const res = await fetch(`/api/product/getproducts`);
+        const res = await fetch(`/api/product/getproducts?userId=${currentUser.userId}`);
         const data = await res.json();
-        console.log(data)
+        
         if (res.ok) {
-          // Filter the bookings based on the current user's email
-          const userProducts = data.products.filter(
-            (product) => product.userId === currentUser.userId
-          );
-          // Update state
-          setUserProducts(userProducts);
+          setUserProducts(data.products);
+        } else {
+          console.error("Error fetching products:", data.message);
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -59,7 +56,7 @@ export default function DashMyProducts() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold text-green-700 pb-4">My Products</h1>
-      {userProducts.length > 0 ? (
+      {Array.isArray(userProducts) && userProducts.length  > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow-lg bg-white p-4">
           <Table hoverable>
             <Table.Head className="bg-black text-black">

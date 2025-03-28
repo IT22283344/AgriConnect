@@ -51,8 +51,14 @@ export const getProducts = async (req, res, next) => {
       limit = 8,
       category,
       price,
+      userId, // Added userId
     } = req.query;
+    
     const queryOptions = {};
+
+    if (userId) {
+      queryOptions.userId = userId; // Filter by userId
+    }
 
     if (productSlug) {
       queryOptions.productSlug = productSlug;
@@ -77,27 +83,78 @@ export const getProducts = async (req, res, next) => {
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    // Calculate average price per district
-    const averagePrices = await Product.aggregate([
-      { $match: queryOptions }, // Apply filters
-      {
-        $group: {
-          _id: { district: "$district", productname: "$productname" },
-          averagePrice: { $avg: "$price" }, 
-        },
-      },
-      { $sort: { "_id.district": 1, "_id.productname": 1 } }, 
-    ]);
-
     res.status(200).json({
       products,
       totalProducts,
       totalPages: Math.ceil(totalProducts / limit),
       currentPage: Number(page),
-      averagePrices, // Send average prices per district
     });
-    console.log(averagePrices);
+
   } catch (error) {
+    next(error);
+  }
+};
+
+
+export const getProductavgprices = async (req, res, next) => {
+  try {
+    const { category } = req.query;
+    const queryOptions = {};
+
+    if (category) {
+      queryOptions.category = category;
+    }
+
+    // Calculate average price per district and overall averages
+    const [districtPrices, overallAverages] = await Promise.all([
+      // District-wise averages
+      Product.aggregate([
+        { $match: queryOptions },
+        {
+          $group: {
+            _id: { 
+              district: "$district",
+              productname: "$productname"
+            },
+            averagePrice: { $avg: "$price" },
+            unit: { $first: "$unit" } // Include unit from first matching document
+          }
+        },
+        { $sort: { "_id.district": 1, "_id.productname": 1 } }
+      ]),
+      
+      // Overall product averages
+      Product.aggregate([
+        { $match: queryOptions },
+        {
+          $group: {
+            _id: "$productname",
+            averagePrice: { $avg: "$price" },
+            unit: { $first: "$unit" }
+          }
+        },
+        { $sort: { "_id": 1 } }
+      ])
+    ]);
+
+    // Transform data for better frontend consumption
+    const transformedData = {
+      districtPrices: districtPrices.map(item => ({
+        district: item._id.district,
+        productname: item._id.productname,
+        averagePrice: item.averagePrice,
+        unit: item.unit || 'per kg'
+      })),
+      averagePrices: overallAverages.map(item => ({
+        productname: item._id,
+        averagePrice: item.averagePrice,
+        unit: item.unit || 'per kg'
+      }))
+    };
+
+    res.status(200).json(transformedData);
+  } catch (error) {
+    console.error('Error in getProductavgprices:', error);
     next(error);
   }
 };
@@ -124,6 +181,7 @@ export const getProductListings = async (req, res, next) => {
       .sort({ [sort]: order })
       .limit(limit)
       .skip(startIndex);
+      
 
     return res.status(200).json(products);
   } catch (error) {

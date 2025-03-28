@@ -3,7 +3,7 @@ import { MdLocationOn } from "react-icons/md";
 
 export default function ProductCard({ product }) {
   return (
-    <div className="bg-white shadow-md rounded-xl overflow-hidden w-full sm:w-[320px] transition-all duration-300 hover:shadow-xl hover:scale-105">
+    <div className="bg-white shadow-md rounded-xl overflow-hidden w-full sm:w-[290px] transition-all duration-300 hover:shadow-xl hover:scale-105">
       <Link to={`/productview/${product._id}`} className="block">
         <div className="relative">
           <img
@@ -27,7 +27,6 @@ export default function ProductCard({ product }) {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <p className="truncate">{product.quantity} available</p>
           </div>
-
 
           <div className="flex justify-between items-center mt-2">
             <p className="text-lg font-bold text-green-700">
