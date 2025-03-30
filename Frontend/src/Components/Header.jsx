@@ -62,14 +62,14 @@ export default function Header() {
           >
             Category
           </NavLink>
-          {currentUser?.role === "farmer" ? (
+          {currentUser?.role === "wholeseller" ? (
             <NavLink
               to={`/support/${currentUser.slug}`}
               className={({ isActive }) =>
                 isActive ? "nav-link-active" : "nav-link"
               }
             >
-              Support
+              Weather
             </NavLink>
           ) : (
             <NavLink
@@ -86,7 +86,7 @@ export default function Header() {
 
         {/* User Profile & Actions */}
         <div className="flex items-center space-x-4">
-        {currentUser && (
+        {currentUser?.role==="wholeseller" && (
               <Link to="/cart">
                 <div className="flex relative">
                   <HiShoppingBag className="mr-1 text-white" style={{ fontSize: '24px' }} />

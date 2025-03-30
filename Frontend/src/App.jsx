@@ -14,6 +14,9 @@ import ProductView from './Pages/ProductView';
 import { Footer } from 'flowbite-react';
 import Cart from './Components/Cart';
 import OrderSummary from './Pages/OrderSummary';
+import UpdateProduct from './Pages/Updateproduct';
+import UpdateReview from './Pages/UpdateReview.';
+import OrderSuccess from './Pages/OrdeSuccess';
 
 
 export default function App() {
@@ -31,6 +34,10 @@ export default function App() {
         <Route path='/addproduct' element={<AddProduct/>}/>
         <Route path='/productpage'element={<Prodcutpage/>}/>
         <Route path='/productview/:productId'element={<ProductView/>}/>
+        <Route path='/updateproduct/:productId'element={<UpdateProduct/>}/>
+        <Route path='/updatereview/:reviewId'element={<UpdateReview/>}/>
+        <Route path='/ordersuccess'element={<OrderSuccess/>}/>
+
 
         <Route path='/cart'element={<Cart/>}/>
         <Route path='/ordersummary'element={<OrderSummary/>}/>

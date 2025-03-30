@@ -1,30 +1,16 @@
-import express from 'express';
-import {
-    createOrder,
-    getOrderById,
-    getMyOrders,
-    getOrders,
-    updateOrderStatus,
-    updatePaymentStatus,
-    getOrdersByStatus,
-    getOrdersByPaymentStatus
-} from '../controllers/orderController.js';
-
+import express from 'express'
+import { createOrder, deleteOrder, getAllOrders, updateOrder, getOrder, testOrder} from '../controllers/orderController.js';
 
 const router = express.Router();
 
-// Protected routes
-router.post('/', createOrder);
-router.get('/myorders', getMyOrders);
-router.get('/:id', getOrderById);
-router.put('/:id/payment', updatePaymentStatus);
+//custommer order handeling routes
+router.post('/create',createOrder);
+router.get('/test', testOrder)
+router.get('/getorders',getAllOrders);
+router.get('/getorder/:id', getOrder);
+router.delete('/deleteorder/:id',deleteOrder);
+router.put('/updateorder/:id',updateOrder);
 
-// Order status and payment status routes
-router.get('/status/:status', getOrdersByStatus);
-router.get('/payment/:paymentStatus', getOrdersByPaymentStatus);
 
-// Admin routes
-router.get('/',  getOrders);
-router.put('/:id/status', updateOrderStatus);
 
-export default router; 
+export default router;

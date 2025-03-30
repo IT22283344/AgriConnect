@@ -75,6 +75,31 @@ export default function DashSideBar() {
               Profile
             </Sidebar.Item>
           </Link>
+
+          {currentUser?.isAdmin && (
+            <>
+              <Link to="/dashboard?tab=users" key="users">
+                <Sidebar.Item
+                  active={tab === "users"}
+                  icon={HiOutlineUserGroup}
+                  as="div"
+                >
+                  Users
+                </Sidebar.Item>
+              </Link>
+
+              <Link to="/dashboard?tab=products" key="products">
+                <Sidebar.Item
+                  active={tab === "products"}
+                  icon={HiOutlineUserGroup}
+                  as="div"
+                >
+                  Products
+                </Sidebar.Item>
+              </Link>
+            </>
+          )}
+          
           {(currentUser?.isAdmin || currentUser?.role === "farmer") && (
             <>
               <Link to="/dashboard?tab=myproducts" key="myproducts">
@@ -87,25 +112,33 @@ export default function DashSideBar() {
                 </Sidebar.Item>
               </Link>
 
-              
-            </>
-          )}
-
-          {(currentUser?.isAdmin) && (
-            <>
-              <Link to="/dashboard?tab=users" key="users">
+              <Link to="/dashboard?tab=my_orders" key="orders">
                 <Sidebar.Item
-                  active={tab === "users"}
-                  icon={HiOutlineUserGroup}
+                  active={tab === "my_orders"}
+                  icon={HiOutlineArchive}
                   as="div"
                 >
-                  Users
+                  My Orders
                 </Sidebar.Item>
               </Link>
-
-              
             </>
           )}
+
+          {currentUser?.role === "wholeseller" && (
+            <>
+              <Link to="/dashboard?tab=my_s_orders" key="my_s_orders">
+                <Sidebar.Item
+                  active={tab === "my_s_orders"}
+                  icon={HiOutlineArchive}
+                  as="div"
+                >
+                  My Orders
+                </Sidebar.Item>
+              </Link>
+            </>
+          )}
+
+         
 
           <hr />
           <Sidebar.Item

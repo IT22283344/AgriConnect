@@ -25,7 +25,7 @@ export default function ProductListing({ product }) {
           </h2>
 
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <p className="truncate">{product.quantity} available</p>
+            <p className="truncate">{product.quantity} {product.unit} available</p>
           </div>
 
           <div className="flex justify-between items-center mt-2">
