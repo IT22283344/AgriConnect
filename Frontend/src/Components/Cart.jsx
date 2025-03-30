@@ -159,7 +159,7 @@ export default function Cart() {
                 <div className="py-4 font-manrope font-semibold hidden lg:block text-black ">
                   <div className="grid grid-cols-12 gap-4">
                     <p className="col-span-6">Product</p>
-                    <p className="col-span-2 text-center">Quantity</p>
+                    <p className="col-span-2 text-center">Quantity(KG)</p>
                     <p className="col-span-2 text-center">Total</p>
                     <p className="col-span-2 text-center">Remove</p>
                   </div>

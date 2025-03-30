@@ -4,7 +4,7 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-export default function DashMyProducts() {
+export default function DashProducts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userProducts, setUserProducts] = useState([]);
   const [showModel, setShowModel] = useState(false);
@@ -13,9 +13,9 @@ export default function DashMyProducts() {
   useEffect(() => {
     const fetchMyProducts = async () => {
       try {
-        const res = await fetch(`/api/product/getproducts?userId=${currentUser.userId}`);
+        const res = await fetch(`/api/product/getproducts`);
         const data = await res.json();
-        
+        console.log(data)
         if (res.ok) {
           setUserProducts(data.products);
         } else {
@@ -26,10 +26,8 @@ export default function DashMyProducts() {
       }
     };
 
-    // Only fetch bookings if there is a valid currentUser
-    if (currentUser?.userId) {
         fetchMyProducts();
-    }
+    
   }, [currentUser]);
 
   const handleDeleteMyProduct = async () => {
@@ -56,7 +54,7 @@ export default function DashMyProducts() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-semibold text-green-700 pb-4">My Products</h1>
+      <h1 className="text-2xl font-semibold text-green-700 pb-4">Products</h1>
       {Array.isArray(userProducts) && userProducts.length  > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow-lg bg-white p-4">
           <Table hoverable>
@@ -95,12 +93,7 @@ export default function DashMyProducts() {
                   </Table.Cell>
                   
                   <Table.Cell className="flex gap-3">
-                  <Link
-                      className="text-teal-500 hover:underline"
-                      to={`/updateproduct/${product._id}`}
-                    >
-                      <span>Edit</span>
-                    </Link>
+                  
                     <button
                       className="text-red-600 hover:underline"
                       onClick={() => {

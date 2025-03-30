@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { HiStar } from "react-icons/hi";
+import UpdateReview from "../Pages/UpdateReview.";
 
 export default function Reviews({ review, onUpdate, onDelete }) {
   const [user, setUser] = useState({});
@@ -15,7 +16,7 @@ export default function Reviews({ review, onUpdate, onDelete }) {
       try {
         const res = await fetch(`/api/user/getUser/${review.userrefId}`);
         const data = await res.json();
-        console.log(data)
+        console.log(data);
         if (res.ok) {
           setUser(data);
         }
@@ -51,7 +52,6 @@ export default function Reviews({ review, onUpdate, onDelete }) {
     }
   };
 
-
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
@@ -84,7 +84,11 @@ export default function Reviews({ review, onUpdate, onDelete }) {
         </div>
 
         {isUpdating ? (
-        ""
+          <UpdateReview
+            review={review}
+            onSave={handleSave}
+            onCancel={() => setIsUpdating(false)}
+          />
         ) : (
           <>
             <div className="text-gray-500 pb-2 text-xl flex flex-wrap items-center">
@@ -119,12 +123,12 @@ export default function Reviews({ review, onUpdate, onDelete }) {
                 </>
               )}
             </div>
+
             <div className="pl-16 ">
               {review.reply && (
                 <>
                   <div className=" bg-slate-100 rounded-md p-1 m-1 w-80">
                     <div className="flex flex-wrap items-center mb-3 ">
-                    
                       <span className="text-xs font-semibold text-blue-600 pt-1 pl-1">
                         {" "}
                         ADMIN{" "}

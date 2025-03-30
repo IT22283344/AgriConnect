@@ -110,7 +110,6 @@ export default function DashUsers() {
             <Table.HeadCell>Distrct</Table.HeadCell>
             <Table.HeadCell>Town</Table.HeadCell>
             <Table.HeadCell>Delete</Table.HeadCell>
-            <Table.HeadCell>Send mail</Table.HeadCell>
           </Table.Head>
           {users.filter((member) => {
             return (
@@ -142,16 +141,7 @@ export default function DashUsers() {
                   >
                     Delete
                   </span>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link
-                    className="text-teal-500 hover:underline"
-                    to={`/dashboard?tab=sendemail&email=${member.username}`}
-                  >
-                    Send Mail
-                  </Link>
-                </Table.Cell>
-                
+                </Table.Cell>                
               </Table.Row>
             </Table.Body>
           ))}

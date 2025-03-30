@@ -13,9 +13,12 @@ export default function OrderSummary() {
   const navigate = useNavigate();
   const deliveryfee = 300;
   const { currentUser } = useSelector((state) => state.user);
+  const farmerId = cart.cartItems.length > 0 ? cart.cartItems[0].FId : null; // retrieve low level items
+
 
   const [payHereFormData, setpayHereFormData] = useState({
     userId: currentUser._id,
+    farmerId,
     productsId: cart.cartItems?.map((cartItem) => ({
       productname: cartItem.productname,
       quantity: cartItem.cartTotalQuantity,
@@ -32,11 +35,13 @@ export default function OrderSummary() {
     totalcost: cart.cartTotalAmount + 300,
   });
 
+  console.log(payHereFormData)
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`/api/orders/`, {
+      const res = await fetch(`/api/orders/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +59,7 @@ export default function OrderSummary() {
 
       // Redirect user to success page
       dispatch(clearCart());
-      navigate("/order-pay-success");
+      navigate("/ordersuccess");
     } catch (error) {
       setPublishError(error.message || "Something went wrong");
     }
@@ -162,17 +167,17 @@ export default function OrderSummary() {
             {cart.cartItems?.map((cartItem) => (
               <>
                 <div
-                  key={cartItem.title}
+                  key={cartItem.productname}
                   className="flex flex-col rounded-lg bg-white sm:flex-row"
                 >
                   <img
                     className="m-2 h-24 w-28 rounded-md border object-cover object-center"
-                    src={cartItem.mainImage}
+                    src={cartItem.images}
                     alt=""
                   />
                   <div className="flex w-full flex-col px-4 py-4">
                     <span className="font-semibold text-rose-600">
-                      {cartItem.title}
+                      {cartItem.productname}
                     </span>
 
                     <span className="float-right text-gray-400">

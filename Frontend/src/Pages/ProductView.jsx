@@ -10,8 +10,7 @@ import ReviewDisplay from "../Components/ReviewsDisplay";
 import ReviewForm from "../Components/ReviewForm";
 import MODRating from "../Components/ModRating";
 import { HiStar } from "react-icons/hi";
-import { addToCart } from '../redux/cart/cartSlice';
-
+import { addToCart } from "../redux/cart/cartSlice";
 
 export default function ProductView() {
   SwiperCore.use([Navigation]);
@@ -27,10 +26,13 @@ export default function ProductView() {
   const [Twostar, setTwostar] = useState(0);
   const [Onestar, setOnestar] = useState(0);
   const [moderateRating, setmoderateRating] = useState(0);
-  const [notification, setNotification] = useState({ visible: false, message: '' });
+  const [notification, setNotification] = useState({
+    visible: false,
+    message: "",
+  });
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.currentUser);
-  
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -59,8 +61,9 @@ export default function ProductView() {
 
   const handleAddToCart = (product) => {
     if (user) {
-      dispatch(addToCart({ product, userId: user.id }));
+      dispatch(addToCart({ product, userId: user.id, FId: product.userId }));
       showNotification("Product added to the cart");
+      console.log(product.userId);
     } else {
       console.log("User not logged in");
     }
@@ -69,10 +72,9 @@ export default function ProductView() {
   const showNotification = (message) => {
     setNotification({ visible: true, message });
     setTimeout(() => {
-      setNotification({ visible: false, message: '' });
+      setNotification({ visible: false, message: "" });
     }, 3000);
   };
-
 
   const getModeratereviews = async (productId) => {
     try {
@@ -287,24 +289,17 @@ export default function ProductView() {
               Available stocks :{product.quantity}
               {product.unit}
             </h1>
-            <div className="flex flex-row gap-6">
-              <button
-                className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 3000);
-                }}
-              >
-                Share Product
-              </button>
-              <button
-                className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-                onClick={() => handleAddToCart(product)}
-              >
-                Add to Cart
-              </button>
-            </div>
+
+            {currentUser?.role === "wholeseller" && (
+              <div className="flex flex-row gap-6">
+                <button
+                  className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+                  onClick={() => handleAddToCart(product)}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            )}
 
             {copied && <p className="text-green-500 text-sm">Link copied!</p>}
           </div>

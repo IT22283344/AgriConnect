@@ -199,13 +199,13 @@ export default function ProductPage() {
             <button className="bg-lime-700 text-white font-semibold py-3 rounded-lg hover:bg-lime-800 transition">
               Search
             </button>
-            <button
+            {/*<button
               type="button"
               // onClick={clearFilters}
               className="bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition"
             >
               Clear Filters
-            </button>
+            </button>*/}
           </div>
         </form>
       </div>

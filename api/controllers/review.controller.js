@@ -128,7 +128,7 @@ export const UpdateReview = async (req, res, next) => {
       return next(errorHandler(404, "Review not found"));
     }
 
-    if (review.userId !== req.user.id && !req.user.isAdmin) {
+    if (review.userrefId !== req.user.id ) {
       return next(errorHandler(403, "you are not allow to edit reviews"));
     }
 

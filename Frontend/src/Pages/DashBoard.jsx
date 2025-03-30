@@ -5,6 +5,9 @@ import DashProfile from "../Components/DashProfile";
 import DashUsers from "../Components/DashUsers";
 import DashMyProducts from "../Components/DashMyProducts";
 import SendMail from "./sendMail";
+import DashMyOrders from "../Components/DashMyOrders";
+import DashsellersOrders from "../Components/DashsellersOrders";
+import DashProducts from "../Components/DashProducts";
 
 
 
@@ -41,9 +44,12 @@ export default function DashBoard() {
       {tab === 'profile' && <DashProfile/>}
       {tab === 'users' && <DashUsers/>}
       {tab === 'myproducts' && <DashMyProducts/>}
+      {tab === 'products' && <DashProducts/>}
       {tab === 'sendemail'&& email && <SendMail email={email} />}
-     
+      {tab === 'my_orders' && <DashMyOrders/>}
+      {tab === 'my_s_orders' && <DashsellersOrders/>}
 
+      
       {/*
       {tab == 'orders' && <DashOrders/>}
       {tab === 'myorders' && <DashMyOrders/>}

@@ -1,228 +1,143 @@
-import Order from '../models/Order.js';
-import Product from '../models/product.model.js';
-import { sendOrderConfirmationEmail } from '../utils/emailService.js';
+import Order from "../models/Order.js";
+import { mongoose } from "mongoose";
+import { errorHandler } from "../utils/error.js";
 
-// @desc    Create new order
-// @route   POST /api/orders
-// @access  Private
-export const createOrder = async (req, res) => {
-    try {
-        const { items, shippingAddress, paymentMethod } = req.body;
-
-        if (!items || items.length === 0) {
-            return res.status(400).json({ message: 'No order items' });
-        }
-
-        // Calculate total amount and verify product availability
-        let totalAmount = 0;
-        for (const item of items) {
-            const product = await Product.findById(item.product);
-            if (!product) {
-                return res.status(404).json({ message: `Product ${item.product} not found` });
-            }
-            if (product.quantity < item.quantity) {
-                return res.status(400).json({ message: `Insufficient quantity for ${product.name}` });
-            }
-            totalAmount += product.price * item.quantity;
-        }
-
-        const order = await Order.create({
-            buyer: req.user._id,
-            items,
-            totalAmount,
-            shippingAddress,
-            paymentMethod
-        });
-
-        // Update product quantities
-        for (const item of items) {
-            const product = await Product.findById(item.product);
-            product.quantity -= item.quantity;
-            if (product.quantity === 0) {
-                product.isAvailable = false;
-            }
-            await product.save();
-        }
-
-        // Send order confirmation email
-        const populatedOrder = await Order.findById(order._id)
-            .populate('items.product', 'name price');
-        
-        const emailSent = await sendOrderConfirmationEmail(populatedOrder, req.user);
-        
-        if (!emailSent) {
-            console.error('Failed to send order confirmation email');
-            // Don't fail the order creation if email fails
-        }
-
-        res.status(201).json({
-            message: 'Order created successfully',
-            order,
-            emailSent
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+//test order
+export const testOrder = (req, res) => {
+  res.json({ msg: "Order works" });
 };
 
-// @desc    Get order by ID
-// @route   GET /api/orders/:id
-// @access  Private
-export const getOrderById = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id)
-            .populate('buyer', 'name email')
-            .populate('items.product', 'name price');
+//create new order
+export const createOrder = async (req, res, next) => {
+  if (
+    !req.body.farmerId ||
+    !req.body.userId ||
+    !req.body.productsId ||
+    !req.body.first_name ||
+    !req.body.last_name ||
+    !req.body.email ||
+    !req.body.phone ||
+    !req.body.address ||
+    !req.body.state ||
+    !req.body.zip ||
+    !req.body.subtotal ||
+    !req.body.deliveryfee ||
+    !req.body.totalcost
+  ) {
+    return next(errorHandler(400, "Please provide all required fields"));
+  }
+  const mobileRegex = /^(071|076|077|075|078|070|074|072)\d{7}$/;
+  if (!mobileRegex.test(req.body.phone)) {
+    return next(errorHandler(400, "Invalid phone number format"));
+  }
 
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
+  const farmerId = req.body.farmerId;
+  const userId = req.body.userId;
+  const productsId = req.body.productsId;
+  const first_name = req.body.first_name;
+  const last_name = req.body.last_name;
+  const email = req.body.email;
+  const phone = req.body.phone;
+  const address = req.body.address;
+  const state = req.body.state;
+  const zip = req.body.zip;
+  const status = req.body.status;
+  const subtotal = req.body.subtotal;
+  const deliveryfee = req.body.deliveryfee;
+  const totalcost = req.body.totalcost;
 
-        // Check if user is authorized to view this order
-        if (order.buyer._id.toString() !== req.user._id.toString() && 
-            req.user.role !== 'admin') {
-            return res.status(401).json({ message: 'Not authorized to view this order' });
-        }
+  function idGen(phone) {
+    const randomString = Math.random().toString(36).substring(2, 10);
+    const id = "ORD" + randomString + phone;
+    return id;
+  }
 
-        res.json(order);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  const orderId = idGen(phone);
+
+  const newOrder = new Order({
+    orderId,
+    farmerId,
+    userId,
+    productsId,
+    first_name,
+    last_name,
+    email,
+    phone,
+    address,
+    state,
+    zip,
+    status,
+    subtotal,
+    deliveryfee,
+    totalcost,
+  });
+
+  try {
+    const savedOrder = await newOrder.save();
+    res.status(201).json(savedOrder);
+  } catch (error) {
+    next(error);
+  }
 };
 
-// @desc    Get logged in user orders
-// @route   GET /api/orders/myorders
-// @access  Private
-export const getMyOrders = async (req, res) => {
-    try {
-        const orders = await Order.find({ buyer: req.user._id })
-            .populate('items.product', 'name price');
-        res.json(orders);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+//get all orders
+export const getAllOrders = async (req, res, next) => {
+  Order.find()
+    .then((orders) => {
+      res.json(orders);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
-// @desc    Get all orders (Admin only)
-// @route   GET /api/orders
-// @access  Private/Admin
-export const getOrders = async (req, res) => {
-    try {
-        const orders = await Order.find({})
-            .populate('buyer', 'name email')
-            .populate('items.product', 'name price');
-        res.json(orders);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+export const getOrder = async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
     }
+
+    res.json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-// @desc    Update order status (Admin only)
-// @route   PUT /api/orders/:id/status
-// @access  Private/Admin
-export const updateOrderStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        const order = await Order.findById(req.params.id);
+//update order
+export const updateOrder = async (req, res, next) => {
+  let orderId = req.params.id;
+  const { first_name, last_name, email, address, state, zip, status } =
+    req.body;
 
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
+  const updateOrder = {
+    first_name,
+    last_name,
+    email,
+    address,
+    state,
+    zip,
+    status,
+  };
 
-        order.status = status;
-        const updatedOrder = await order.save();
-        res.json(updatedOrder);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    await Order.findByIdAndUpdate(orderId, updateOrder);
+    res.status(200).json(updateOrder);
+  } catch (error) {
+    next(error);
+  }
 };
 
-// @desc    Update payment status
-// @route   PUT /api/orders/:id/payment
-// @access  Private
-export const updatePaymentStatus = async (req, res) => {
-    try {
-        const { paymentStatus } = req.body;
-        const order = await Order.findById(req.params.id);
-
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-
-        // Only allow buyer or admin to update payment status
-        if (order.buyer.toString() !== req.user._id.toString() && 
-            req.user.role !== 'admin') {
-            return res.status(401).json({ message: 'Not authorized to update payment status' });
-        }
-
-        order.paymentStatus = paymentStatus;
-        const updatedOrder = await order.save();
-        res.json(updatedOrder);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+//delete order
+export const deleteOrder = async (req, res, next) => {
+  let orderId = req.params.id;
+  try {
+    await Order.findByIdAndDelete(orderId);
+    res.status(200).json("The Order has been deleted");
+  } catch (error) {
+    next(error);
+  }
 };
-
-// @desc    Get orders by status
-// @route   GET /api/orders/status/:status
-// @access  Private
-export const getOrdersByStatus = async (req, res) => {
-    try {
-        const { status } = req.params;
-        const query = {};
-
-        // If user is not admin, only show their own orders
-        if (req.user.role !== 'admin') {
-            query.buyer = req.user._id;
-        }
-
-        // Validate status
-        const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: 'Invalid status' });
-        }
-
-        query.status = status;
-
-        const orders = await Order.find(query)
-            .populate('buyer', 'name email')
-            .populate('items.product', 'name price')
-            .sort('-createdAt');
-
-        res.json(orders);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Get orders by payment status
-// @route   GET /api/orders/payment/:paymentStatus
-// @access  Private
-export const getOrdersByPaymentStatus = async (req, res) => {
-    try {
-        const { paymentStatus } = req.params;
-        const query = {};
-
-        // If user is not admin, only show their own orders
-        if (req.user.role !== 'admin') {
-            query.buyer = req.user._id;
-        }
-
-        // Validate payment status
-        const validPaymentStatuses = ['pending', 'completed', 'failed'];
-        if (!validPaymentStatuses.includes(paymentStatus)) {
-            return res.status(400).json({ message: 'Invalid payment status' });
-        }
-
-        query.paymentStatus = paymentStatus;
-
-        const orders = await Order.find(query)
-            .populate('buyer', 'name email')
-            .populate('items.product', 'name price')
-            .sort('-createdAt');
-
-        res.json(orders);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}; 

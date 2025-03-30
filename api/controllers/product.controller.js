@@ -4,9 +4,7 @@ import { errorHandler } from "../utils/error.js";
 export const addProduct = async (req, res, next) => {
   try {
     const { productname, userId, district, province, town } = req.body;
-    if (!req.user.role === "farmer") {
-      return next(errorHandler(403, "You are not allowed to add product"));
-    }
+   
     if (
       !req.body.productname ||
       !req.body.unit ||
@@ -51,8 +49,10 @@ export const getProducts = async (req, res, next) => {
       limit = 8,
       category,
       price,
-      userId, // Added userId
+      userId, 
     } = req.query;
+
+ 
     
     const queryOptions = {};
 
@@ -201,28 +201,45 @@ export const getProductById = async (req, res, next) => {
   }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    const { productId, userId } = req.params;
+    
+    // Validate input
+    if (!productId || !userId) {
+      return next(errorHandler(400, "Product ID and User ID are required"));
     }
 
-    // Check if the user is the farmer who created the product
-    if (product.farmer.toString() !== req.user._id.toString()) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized to update this product" });
+    const product = await Product.findById(productId);
+    if (!product) {
+      return next(errorHandler(404, "Product not found"));
     }
+
+       const updateData = {
+      productname: req.body.productname,
+      description: req.body.description,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      unit: req.body.unit,
+      category: req.body.category,
+      discountedPrice: req.body.discountedPrice,
+      isAvailable: req.body.isAvailable,
+      images: req.body.images || []
+    };
 
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
+      productId,
+      updateData,
+      { new: true, runValidators: true }
     );
-    res.json(updatedProduct);
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
