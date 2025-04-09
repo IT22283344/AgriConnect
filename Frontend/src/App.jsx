@@ -17,6 +17,7 @@ import OrderSummary from './Pages/OrderSummary';
 import UpdateProduct from './Pages/Updateproduct';
 import UpdateReview from './Pages/UpdateReview.';
 import OrderSuccess from './Pages/OrdeSuccess';
+import AveragePrice from './Pages/AveragePrice';
 
 
 export default function App() {
@@ -37,6 +38,8 @@ export default function App() {
         <Route path='/updateproduct/:productId'element={<UpdateProduct/>}/>
         <Route path='/updatereview/:reviewId'element={<UpdateReview/>}/>
         <Route path='/ordersuccess'element={<OrderSuccess/>}/>
+        <Route path='/averageprice'element={<AveragePrice/>}/>
+
 
 
         <Route path='/cart'element={<Cart/>}/>

@@ -13,9 +13,11 @@ export default function DashMyProducts() {
   useEffect(() => {
     const fetchMyProducts = async () => {
       try {
-        const res = await fetch(`/api/product/getproducts?userId=${currentUser.userId}`);
+        const res = await fetch(
+          `/api/product/getproducts?userId=${currentUser.userId}`
+        );
         const data = await res.json();
-        
+
         if (res.ok) {
           setUserProducts(data.products);
         } else {
@@ -28,7 +30,7 @@ export default function DashMyProducts() {
 
     // Only fetch bookings if there is a valid currentUser
     if (currentUser?.userId) {
-        fetchMyProducts();
+      fetchMyProducts();
     }
   }, [currentUser]);
 
@@ -56,8 +58,25 @@ export default function DashMyProducts() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-semibold text-green-700 pb-4">My Products</h1>
-      {Array.isArray(userProducts) && userProducts.length  > 0 ? (
+      <h1 className="text-2xl font-semibold text-green-700 pb-4">
+        My Products
+      </h1>
+      <div className=" w-40 m-8 p">
+        {currentUser?.role === "farmer" && (
+          <>
+            <Link to="/addproduct">
+              <Button
+                type="button"
+                className="w-full mt-8  text-black bg-slate-400 "
+                outline
+              >
+                Add Listing
+              </Button>
+            </Link>
+          </>
+        )}
+      </div>
+      {Array.isArray(userProducts) && userProducts.length > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow-lg bg-white p-4">
           <Table hoverable>
             <Table.Head className="bg-black text-black">
@@ -75,7 +94,9 @@ export default function DashMyProducts() {
                   key={product._id}
                   className="bg-gray-50 hover:bg-gray-100 transition-all"
                 >
-                  <Table.Cell>{new Date(product.updatedAt).toLocaleDateString()}</Table.Cell>
+                  <Table.Cell>
+                    {new Date(product.updatedAt).toLocaleDateString()}
+                  </Table.Cell>
                   <Table.Cell className="font-medium text-gray-900">
                     {product.productname}
                   </Table.Cell>
@@ -87,15 +108,18 @@ export default function DashMyProducts() {
                     {product.quantity} {product.unit.toUpperCase()}
                   </Table.Cell>
                   <Table.Cell>
-                    {product.isAvailable ? (
-                      <span className="text-green-600 font-medium">Available</span>
+                    {product.quantity > 100  ? (
+                      <span className="text-blue-600 font-medium">
+                        Available
+                      </span>
                     ) : (
-                      <span className="text-red-600 font-medium">Not Available</span>
+                      <div>{product.quantity < 100 && <span className="font-medium text-red-600"> Low Stock</span>}</div>
+
                     )}
                   </Table.Cell>
-                  
+
                   <Table.Cell className="flex gap-3">
-                  <Link
+                    <Link
                       className="text-teal-500 hover:underline"
                       to={`/updateproduct/${product._id}`}
                     >
@@ -120,7 +144,12 @@ export default function DashMyProducts() {
         <p className="text-center text-gray-500 mt-4">No products available.</p>
       )}
 
-      <Modal show={showModel} onClose={() => setShowModel(false)} popup size="md">
+      <Modal
+        show={showModel}
+        onClose={() => setShowModel(false)}
+        popup
+        size="md"
+      >
         <Modal.Header />
         <Modal.Body>
           <div className="text-center">
@@ -130,10 +159,13 @@ export default function DashMyProducts() {
             </h3>
           </div>
           <div className="flex justify-center gap-4">
-            <Button color="failure" onClick={() => {
-              handleDeleteMyProduct(productIdToDelete);
-              setShowModel(false);
-            }}>
+            <Button
+              color="failure"
+              onClick={() => {
+                handleDeleteMyProduct(productIdToDelete);
+                setShowModel(false);
+              }}
+            >
               Yes, delete
             </Button>
             <Button color="gray" onClick={() => setShowModel(false)}>

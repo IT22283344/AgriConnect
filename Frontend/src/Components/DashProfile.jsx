@@ -19,8 +19,17 @@ import {
   updateUserStart,
   updateUserSuccess,
 } from "../redux/user/userSlice";
-import { HiOutlineExclamationCircle, HiPencil } from "react-icons/hi";
+import {
+  HiOutlineExclamationCircle,
+  HiPencil,
+  HiEye,
+  HiEyeOff,
+  HiQuestionMarkCircle,
+  HiOutlineLogout,
+  HiOutlineTrash,
+} from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/agrilogo.png";
 
 export default function DashProfile() {
   const dispatch = useDispatch();
@@ -36,13 +45,17 @@ export default function DashProfile() {
   const [showModel, setShowModel] = useState(false);
   const filePickerRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
-  console.log(formData);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setImageError("File size should be less than 5MB");
+        return;
+      }
       setImage(file);
       setImageFileUrl(URL.createObjectURL(file));
+      setImageError(null);
     }
   };
 
@@ -66,7 +79,7 @@ export default function DashProfile() {
         setImagePercent(progress.toFixed(0));
       },
       (error) => {
-        setImageError("Image size should be less than 5mb");
+        setImageError("Image upload failed. Please try again.");
         console.error("Upload error:", error);
         setImagePercent(null);
         setImage(null);
@@ -94,6 +107,10 @@ export default function DashProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (Object.keys(formData).length === 0) {
+      setUpdateUserError("No changes detected");
+      return;
+    }
 
     try {
       dispatch(updateUserStart());
@@ -112,14 +129,17 @@ export default function DashProfile() {
         return;
       }
       dispatch(updateUserSuccess(data));
-      setUpdateSuccess("User profile updated successfully");
+      setUpdateSuccess("Profile updated successfully!");
       setUpdateUserError(null);
+      // Clear form data after successful update
+      setFormData({});
     } catch (error) {
       dispatch(updateUserFailure(error));
       setUpdateUserError(error.message);
       setUpdateSuccess(null);
     }
   };
+
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
@@ -137,6 +157,7 @@ export default function DashProfile() {
       dispatch(deleteUserFailure(error));
     }
   };
+
   const handleSignOut = async () => {
     try {
       await fetch("/api/user/signout");
@@ -146,328 +167,382 @@ export default function DashProfile() {
       console.log(error);
     }
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   return (
-    <>
-      <div className="max-w-6xl m-6 border  rounded-lg shadow-lg mx-auto p-6 w-full">
-        <h1 className="my-7 text-center font-Lavish un text-3xl">
-          Profile (<span>{currentUser.role.toUpperCase()})</span>{" "}
-        </h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-row gap-8">
-            <div className="w-1/3 items-center justify-center ml-8 mt-3 border rounded-lg p-4">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                ref={filePickerRef}
-                hidden
+    <div className="max-w-6xl mx-auto p-4 md:p-6">
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-green-600 to-lime-500 p-6 text-white">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div className="flex flex-row gap-2">
+              <img
+                className="h-18 w-16 rounded-lg shadow-md"
+                src={logo}
+                alt="Agri Connect Logo"
               />
-              <div
-                className="relative w-40 h-40 self-center cursor-pointer shadow-md ml-16 overflow-hidden rounded-full"
-                onClick={() => filePickerRef.current.click()}
-              >
-                {imagePercent > 0 && imagePercent < 100 && (
-                  <CircularProgressbar
-                    value={imagePercent}
-                    text={`${imagePercent}%`}
-                    strokeWidth={5}
-                    styles={{
-                      root: {
-                        width: "100%",
-                        height: "100%",
-                        position: "absolute",
-                      },
-                      path: {
-                        stroke: `rgba(62, 152, 199, ${imagePercent / 100})`,
-                      },
-                    }}
-                    aria-label="Uploading Image"
-                  />
-                )}
-                <img
-                  src={imageFileUrl || currentUser.profilePicture}
-                  alt="user"
-                  className={`rounded-full w-full h-full border-8 border-[lightgray] ${
-                    imagePercent && imagePercent < 100 ? "opacity-60" : ""
-                  }`}
-                  aria-label="User Profile Image"
-                />
-              </div>
-              <p className="text-red-500 text-xs ml-16">
-                <HiPencil onClick={() => filePickerRef.current.click()} className="text-xl" />
-                Change your Profile Picture!
-              </p>
-
-              {currentUser?.role === "farmer" && (
-                <>
-                  <Link to="/addproduct">
-                    <Button
-                      type="button"
-                      className="w-full mt-8  text-black bg-slate-400 "
-                      outline
-                    >
-                      Add Listing
-                    </Button>
-                  </Link>
-                </>
-              )}
-              <div className="text-red-500 font-semibold flex justify-between mt-5">
-                <span
-                  onClick={() => setShowModel(true)}
-                  className="cursor-pointer"
-                >
-                  Delete Account
-                </span>
-                <span onClick={handleSignOut} className="cursor-pointer">
-                  Sign Out
-                </span>
-              </div>
-
-              {/*currentUser?.role === "wholeseller" && (
-                <>
-                  <Link to="">
-                    <Button
-                      type="button"
-                      className="w-full , text-black bg-slate-400 "
-                      outline
-                    >
-                      Add Request
-                    </Button>
-                  </Link>
-                </>
-               )*/}
-              {imageError && <Alert color="failure">{imageError}</Alert>}
-            </div>
-            <div className="w-3/4 flex flex-col ">
-              <div className="flex flex-row justify-between">
-                <div className="flex flex-col">
-                  <span className="text-yellow-500 text-4xl font-Lavish">
-                    Hello {currentUser.username}!
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">
+                  My Profile{" "}
+                  <span className="text-yellow-200">
+                    ({currentUser.role.toUpperCase()})
                   </span>
-                  <span className="text-2xl font-Lavish">
-                    Welcome to Agri Connect!{" "}
-                  </span>{" "}
-                </div>
-                <Button className="text-white bg-lime-700 items-center">
-                  Help Desk !
-                </Button>
+                </h1>
+                <p className="mt-1 text-green-100">
+                  Manage your account settings
+                </p>
               </div>
-              <div className="m-2 p-2">
-                <div className="M-3 p-1">
-                  <Label>USERID</Label>
-                  <TextInput
-                    type="text"
-                    id="userId"
-                    placeholder="USERID"
-                    disabled
-                    defaultValue={currentUser.userId}
-                    onChange={handleChange}
-                    className="opacity-85"
-                  />
-                </div>
-                <div className="M-3 p-1">
-                  <Label>USERNAME</Label>
-                  <TextInput
-                    type="text"
-                    id="username"
-                    placeholder="username"
-                    defaultValue={currentUser.username}
-                    onChange={handleChange}
-                  />
-                </div>
+            </div>
+            <Button
+              gradientDuoTone="cyanToBlue"
+              pill
+              className="mt-4 md:mt-0 flex items-center"
+            >
+              <HiQuestionMarkCircle className="mr-2" />
+              Help Center
+            </Button>
+          </div>
+        </div>
 
-                <div className="M-3 p-1">
-                  <Label>CONTACTNO</Label>
-                  <TextInput
-                    type="text"
-                    id="mobile"
-                    placeholder="mobile"
-                    defaultValue={currentUser.mobile}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="M-3 p-1">
-                  <Label>E-MAIL</Label>
-                  <TextInput
-                    type="email"
-                    id="email"
-                    disabled
-                    placeholder="email"
-                    defaultValue={currentUser.email}
-                    onChange={handleChange}
-                    className="opacity-85"
-                  />
-                </div>
-                <div className="M-3 p-1">
-                  <Label>ADDRESS</Label>
-                  <TextInput
-                    type="text"
-                    id="adress"
-                    placeholder="adress"
-                    defaultValue={currentUser.adress}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="flex flex-row gap-2">
-                  <div className="M-3 p-1 w-1/3">
-                    <Label>PROVINCE</Label>
-                    <TextInput
-                      type="text"
-                      id="province"
-                      placeholder="Province"
-                      defaultValue={currentUser.province}
-                      onChange={handleChange}
+        {/* Main Content */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Left Column - Profile Picture */}
+              <div className="w-full lg:w-1/3">
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      ref={filePickerRef}
+                      hidden
                     />
-                  </div>
-                  <div className="M-3 p-1  w-1/3">
-                    <Label>DISTRICT</Label>
-                    <TextInput
-                      type="text"
-                      id="district"
-                      placeholder="District"
-                      defaultValue={currentUser.district}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="M-3 p-1  w-1/3">
-                    <Label>TOWN</Label>
-                    <TextInput
-                      type="text"
-                      id="town"
-                      placeholder="Town"
-                      defaultValue={currentUser.town}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
+                    <div
+                      className="relative w-32 h-32 md:w-40 md:h-40 cursor-pointer group"
+                      onClick={() => filePickerRef.current.click()}
+                    >
+                      {imagePercent > 0 && imagePercent < 100 && (
+                        <CircularProgressbar
+                          value={imagePercent}
+                          text={`${imagePercent}%`}
+                          strokeWidth={5}
+                          styles={{
+                            root: {
+                              width: "100%",
+                              height: "100%",
+                              position: "absolute",
+                              zIndex: 10,
+                            },
+                            path: {
+                              stroke: `rgba(72, 187, 120, ${
+                                imagePercent / 100
+                              })`,
+                            },
+                          }}
+                        />
+                      )}
+                      <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-white shadow-md group-hover:border-green-300 transition-all duration-200">
+                        <img
+                          src={imageFileUrl || currentUser.profilePicture}
+                          alt="Profile"
+                          className={`w-full h-full object-cover ${
+                            imagePercent && imagePercent < 100
+                              ? "opacity-60"
+                              : ""
+                          }`}
+                        />
+                      </div>
+                      <div className="absolute bottom-0 right-0 bg-green-500 text-white p-2 rounded-full shadow-lg transform translate-x-1 translate-y-1 group-hover:scale-110 transition-all">
+                        <HiPencil className="text-lg" />
+                      </div>
+                    </div>
 
-                <div className="M-3 p-1">
-                  <Label>PASSWORD</Label>
-
-                  <div className="relative">
-                    <TextInput
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Password"
-                      id="password"
-                      onChange={handleChange}
-                    />
                     <button
                       type="button"
-                      className="absolute top-2 right-3 focus:outline-none"
-                      onClick={togglePasswordVisibility}
+                      className="mt-4 text-sm text-green-600 hover:text-green-800 font-medium flex items-center"
+                      onClick={() => filePickerRef.current.click()}
                     >
-                      {showPassword ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 text-gray-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 4.5c5.185 0 9.448 4.014 9.95 9.048a.944.944 0 0 1 0 .904C21.448 16.486 17.185 20.5 12 20.5S2.552 16.486 2.05 13.452a.944.944 0 0 1 0-.904C2.552 8.514 6.815 4.5 12 4.5zM12 6a9 9 0 0 0-8.72 6.752.944.944 0 0 1 0 .496A9 9 0 0 0 12 18a9 9 0 0 0 8.72-4.752.944.944 0 0 1 0-.496A9 9 0 0 0 12 6z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 12.75a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5z"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 text-gray-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 15a7 7 0 01-7-7M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      )}
+                      <HiPencil className="mr-1" />
+                      Change profile photo
                     </button>
+
+                    {imageError && (
+                      <p className="mt-2 text-sm text-red-500">{imageError}</p>
+                    )}
+
+                    <div className="mt-6 w-full space-y-3">
+                      <Button
+                        onClick={handleSignOut}
+                        color="light"
+                        className="w-full flex items-center justify-center text-red-500 hover:bg-red-50"
+                      >
+                        <HiOutlineLogout className="mr-2" />
+                        Sign Out
+                      </Button>
+                      <Button
+                        onClick={() => setShowModel(true)}
+                        color="light"
+                        className="w-full flex items-center justify-center text-red-500 hover:bg-red-50"
+                      >
+                        <HiOutlineTrash className="mr-2" />
+                        Delete Account
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-              <Button
-                type="submit"
-                outline
-                className="bg-slate-400 text-black ml-16 mr-16"
-                disabled={loading}
-              >
-                {loading ? "Loading.." : "Update Account"}
-              </Button>
-            </div>
-          </div>
-        </form>
 
-        <div className="text-green-600">
+              {/* Right Column - Form Fields */}
+              <div className="w-full lg:w-2/3">
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                    Personal Information
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label
+                        htmlFor="userId"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        User ID
+                      </Label>
+                      <TextInput
+                        id="userId"
+                        type="text"
+                        defaultValue={currentUser.userId}
+                        disabled
+                        className="w-full bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="username"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Username
+                      </Label>
+                      <TextInput
+                        id="username"
+                        type="text"
+                        placeholder="Username"
+                        defaultValue={currentUser.username}
+                        onChange={handleChange}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Email
+                      </Label>
+                      <TextInput
+                        id="email"
+                        type="email"
+                        defaultValue={currentUser.email}
+                        disabled
+                        className="w-full bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="mobile"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Contact Number
+                      </Label>
+                      <TextInput
+                        id="mobile"
+                        type="tel"
+                        placeholder="Phone number"
+                        defaultValue={currentUser.mobile}
+                        onChange={handleChange}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <Label
+                      htmlFor="adress"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Address
+                    </Label>
+                    <TextInput
+                      id="adress"
+                      type="text"
+                      placeholder="Full address"
+                      defaultValue={currentUser.adress}
+                      onChange={handleChange}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                      <Label
+                        htmlFor="province"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Province
+                      </Label>
+                      <TextInput
+                        id="province"
+                        type="text"
+                        placeholder="Province"
+                        defaultValue={currentUser.province}
+                        onChange={handleChange}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="district"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        District
+                      </Label>
+                      <TextInput
+                        id="district"
+                        type="text"
+                        placeholder="District"
+                        defaultValue={currentUser.district}
+                        onChange={handleChange}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="town"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Town
+                      </Label>
+                      <TextInput
+                        id="town"
+                        type="text"
+                        placeholder="Town"
+                        defaultValue={currentUser.town}
+                        onChange={handleChange}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <Label
+                      htmlFor="password"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <TextInput
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        onChange={handleChange}
+                        className="w-full pr-10"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <HiEyeOff className="h-5 w-5" />
+                        ) : (
+                          <HiEye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Leave blank to keep current password
+                    </p>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      gradientDuoTone="greenToBlue"
+                      disabled={loading}
+                      className="px-5 py-1.5 hover:animate-pulse border border-lime-700 font-bold"
+                    >
+                      {loading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          {/* Success and Error Messages */}
           {updateSuccess && (
-            <Alert color="success" className="mt-5">
-              {updateSuccess}
-            </Alert>
-          )}
-        </div>
-
-        <div className="text-red-600">
-          {updateUserError && (
-            <Alert color="failure" className="mt-5">
-              {updateUserError}
-            </Alert>
-          )}
-        </div>
-
-        <Modal
-          show={showModel}
-          onClose={() => setShowModel(false)}
-          popup
-          size="md"
-        >
-          <Modal.Header />
-          <Modal.Body>
-            <div className="text-center">
-              <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
-              <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-200">
-                Are you sure you want to Delete your Account
-              </h3>
+            <div className="mt-6">
+              <Alert color="success" className="rounded-lg">
+                <span className="font-medium">{updateSuccess}</span>
+              </Alert>
             </div>
+          )}
+
+          {updateUserError && (
+            <div className="mt-6">
+              <Alert color="failure" className="rounded-lg">
+                <span className="font-medium">{updateUserError}</span>
+              </Alert>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Delete Account Modal */}
+      <Modal
+        show={showModel}
+        onClose={() => setShowModel(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header className="border-b-0" />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Delete Your Account
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Are you sure you want to delete your account? This action cannot
+              be undone.
+            </p>
             <div className="flex justify-center gap-4">
               <Button
                 color="failure"
                 onClick={handleDeleteUser}
-                className="bg-red-600"
+                className="bg-red-600 hover:bg-red-700 px-6 py-2.5"
               >
-                Yes, I am sure
+                Yes, delete it
               </Button>
               <Button
-                color="gray"
+                color="light"
                 onClick={() => setShowModel(false)}
-                className="bg-green-600"
+                className="border border-gray-300 hover:bg-gray-50 px-6 py-2.5"
               >
-                No, cancel
+                Cancel
               </Button>
             </div>
-          </Modal.Body>
-        </Modal>
-      </div>
-    </>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </div>
   );
 }

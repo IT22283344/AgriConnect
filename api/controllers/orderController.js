@@ -42,6 +42,7 @@ export const createOrder = async (req, res, next) => {
   const state = req.body.state;
   const zip = req.body.zip;
   const status = req.body.status;
+  const deliveryStatus = req.body.deliveryStatus;
   const subtotal = req.body.subtotal;
   const deliveryfee = req.body.deliveryfee;
   const totalcost = req.body.totalcost;
@@ -70,6 +71,7 @@ export const createOrder = async (req, res, next) => {
     subtotal,
     deliveryfee,
     totalcost,
+    deliveryStatus,
   });
 
   try {
@@ -139,5 +141,26 @@ export const deleteOrder = async (req, res, next) => {
     res.status(200).json("The Order has been deleted");
   } catch (error) {
     next(error);
+  }
+};
+
+export const updatedeliverystatus = async (req, res, next) => {
+  try {
+    const { orderId } = req.params;
+    const { deliveryStatus } = req.body;
+
+    const formdata = await Order.findByIdAndUpdate(
+      orderId,
+      { deliveryStatus },
+      { new: true } // Corrected this line
+    );
+
+    if (!formdata) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.status(200).json(formdata);
+  } catch (error) {
+    next(error);
+    console.log(error);
   }
 };

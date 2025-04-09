@@ -286,8 +286,11 @@ export default function ProductView() {
               )}
             </div>
             <h1 className="text-xl font-semibold text-gray-900">
+
               Available stocks :{product.quantity}
               {product.unit}
+              {product.quantity < 100 && <span style={{ color: 'red' }}> (Low Stock)</span>}
+
             </h1>
 
             {currentUser?.role === "wholeseller" && (

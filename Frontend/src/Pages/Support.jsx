@@ -19,7 +19,8 @@ export default function WeatherForecast() {
       try {
         const res = await fetch(`/api/user/getuser/${currentUser._id}`);
         const data = await res.json();
-        if (res.ok) setUsers(data);
+        if (res.ok) 
+          setUsers(data);
       } catch (error) {
         console.error("Error fetching user:", error);
       }

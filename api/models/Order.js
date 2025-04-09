@@ -1,73 +1,78 @@
+import mongoose from "mongoose";
 
-import mongoose from 'mongoose'
-
-const orderSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema(
+  {
     orderId: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+      required: true,
+      unique: true,
     },
     userId: {
-        type:String,
-        required : true,
-        ref:"User"
+      type: String,
+      required: true,
+      ref: "User",
     },
     farmerId: {
-      type:String,
-      ref: 'User',
+      type: String,
+      ref: "User",
     },
-    productsId:{
-        type:Array,
-        required: true,
+    productsId: {
+      type: Array,
+      required: true,
     },
-    first_name:{
-        type:String,
-        required:true,
+    first_name: {
+      type: String,
+      required: true,
     },
-    last_name:{
-        type:String,
-        required:true,
+    last_name: {
+      type: String,
+      required: true,
     },
-    email:{
-        type:String,  
-        lowercase:true, 
+    email: {
+      type: String,
+      lowercase: true,
     },
-    phone:{
-        type:Number,
-        required:true,
+    phone: {
+      type: Number,
+      required: true,
     },
-    address:{
-        type:String,
-        required:true,
+    address: {
+      type: String,
+      required: true,
     },
-    state:{
-        type:String,
-        required:true,
+    state: {
+      type: String,
+      required: true,
     },
-    zip:{
-        type:Number,
-        required:true,
+    zip: {
+      type: Number,
+      required: true,
     },
-    status:{
-        type:Boolean,
-        default:false
+    status: {
+      type: Boolean,
+      default: false,
     },
-    subtotal:{
-        type: Number,
-        default:0.00,
+    subtotal: {
+      type: Number,
+      default: 0.0,
     },
-    deliveryfee:{
-        type: Number,
-        default:300,
+    deliveryfee: {
+      type: Number,
+      default: 300,
     },
-    totalcost:{
-       type: Number,
-       required:true,
+    totalcost: {
+      type: Number,
+      required: true,
     },
-    }, {timestamps: true}
-
+    deliveryStatus: {
+      type: String,
+      enum: ["ready", "OnTheWay", "Arrived"],
+      default: "Pending",
+    },
+  },
+  { timestamps: true }
 );
 
-const Order = mongoose.model('Order',orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 
 export default Order;

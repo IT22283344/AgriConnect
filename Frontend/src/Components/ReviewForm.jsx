@@ -14,7 +14,7 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 
-export default function ReviewForm({ productId, productname }) {
+export default function ReviewForm({ productname }) {
   const { currentUser } = useSelector((state) => state.user);
   const [reviewError, setReviewError] = useState(null);
   const [file, setFile] = useState(null);

@@ -62,7 +62,7 @@ export default function Header() {
           >
             Category
           </NavLink>
-          {currentUser?.role === "wholeseller" ? (
+          {currentUser?.role === "farmer" ? (
             <NavLink
               to={`/support/${currentUser.slug}`}
               className={({ isActive }) =>
@@ -73,12 +73,12 @@ export default function Header() {
             </NavLink>
           ) : (
             <NavLink
-              to={`/support`}
+              to={`/averageprice`}
               className={({ isActive }) =>
                 isActive ? "nav-link-active" : "nav-link"
               }
             >
-              Support
+              Average Prices
             </NavLink>
           )}
 
