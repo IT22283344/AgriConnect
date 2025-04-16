@@ -1,7 +1,14 @@
-import { Button, Modal, Table, TextInput } from "flowbite-react";
+import { Button, Card, Modal, Table, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { HiCheck, HiCheckCircle, HiOutlineExclamationCircle } from "react-icons/hi";
+import {
+  HiCheck,
+  HiCheckCircle,
+  HiOutlineExclamationCircle,
+  HiReceiptTax,
+} from "react-icons/hi";
 import { useSelector } from "react-redux";
+import ReviewForm from "./ReviewForm";
+import { Link } from "react-router-dom";
 
 export default function DashsellersOrders() {
   const { currentUser } = useSelector((state) => state.user);
@@ -124,6 +131,13 @@ export default function DashsellersOrders() {
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
       <div className="flex flex-wrap gap-5"></div>
+      <div className="flex flex-row gap-8 m-5">
+        <Card>Total orders</Card>
+        <Card>Pending orders</Card>
+        <Card>Completed  orders</Card>
+        <Card>On going orders</Card>
+
+      </div>
       <h1 className="pt-6 px-4 font-semibold">My Orders</h1>
       {Array.isArray(Order) && Order.length > 0 ? (
         <>
@@ -146,10 +160,13 @@ export default function DashsellersOrders() {
 
           <Table hoverable className="shadow-md">
             <Table.Head>
-              <Table.HeadCell>Order</Table.HeadCell>
+              <Table.HeadCell>OrderID</Table.HeadCell>
+              <Table.HeadCell>Items</Table.HeadCell>
               <Table.HeadCell>Farmer ID</Table.HeadCell>
               <Table.HeadCell>Contact Number</Table.HeadCell>
               <Table.HeadCell>Address</Table.HeadCell>
+              <Table.HeadCell>ZIP code</Table.HeadCell>
+              <Table.HeadCell>Total Quentity Fee</Table.HeadCell>
               <Table.HeadCell>Delivery Fee</Table.HeadCell>
               <Table.HeadCell>Cost for order</Table.HeadCell>
               <Table.HeadCell>Order Status</Table.HeadCell>
@@ -172,6 +189,7 @@ export default function DashsellersOrders() {
             }).map((item) => (
               <Table.Body className="divide-y" key={item._id}>
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell>{item.orderId}</Table.Cell>
                   <Table.Cell>
                     {item.productsId.map((product) => (
                       <p key={product._id} className="font-semibold">
@@ -182,54 +200,57 @@ export default function DashsellersOrders() {
                   <Table.Cell>{item.farmerId}</Table.Cell>
                   <Table.Cell>{item.phone}</Table.Cell>
                   <Table.Cell>
-                    {item.address} {item.state}
+                    {item.address}, {item.state}
                   </Table.Cell>
+                  <Table.Cell>{item.zip}</Table.Cell>
+                  <Table.Cell>{item.cartTotalQuantity}</Table.Cell>
                   <Table.Cell>{item.deliveryfee}</Table.Cell>
                   <Table.Cell>{item.totalcost}</Table.Cell>
                   <Table.Cell>
                     <span
                       className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
-                        item.deliveryStatus
+                        item.deliveryStatus.toUpperCase()
                           ? "bg-blue-100 text-blue-600"
                           : "bg-red-100 text-red-600"
                       }`}
                     >
-                      {item.deliveryStatus ? "OnTheWay" : "Arrived"}
+                      {item.deliveryStatus}
                     </span>
                   </Table.Cell>
                   <Table.Cell>
                     {
                       <div className="flex justify-end gap-2 mt-6">
-                        {currentUser?.role === "farmer" && (
-                        <button
-                          onClick={() =>
-                            handleUpdateDeliveryStatus(item._id, "OnTheWay")
-                          }
-                          className="text-green-500 hover:underline hover:text-orange-700  hover:font-bold flex items-center gap-1 font-semibold  "
-                        >
-                          <HiCheck className="inline" /> Delivered
-                        </button>
-                        )}
-                        {currentUser?.role === "wholeseller" && (
-                          <button
-                            onClick={() =>
-                              handleUpdateDeliveryStatus(item._id, "Arrived")
-                            }
-                            className="text-orange-500 hover:underline hover:text-orange-700 hover:font-bold flex items-center gap-1  font-semibold"
-                          >
-                            <HiCheckCircle className="inline" /> Complete
-                          </button>
-                        )}
-
-                        {/*<button
-                                           onClick={() => updateStatus(booking._id, "Cancelled")}
-                                            className="text-red-500 hover:underline flex items-center gap-1"
-                                          >
-                                            <HiXCircle className="inline" /> Cancel
-                                          </button>*/}
+                        {currentUser?.role === "wholeseller" &&
+                          (item.deliveryStatus === "Arrived" || item.deliveryStatus === "Pending" ? (
+                            <button
+                              disabled
+                              onClick={() =>
+                                handleUpdateDeliveryStatus(item._id, "Arrived")
+                              }
+                              className="cursor-not-allowed text-green-500 hover:underline hover:text-orange-700 opacity-30  hover:font-bold flex items-center gap-1 font-semibold  "
+                            >
+                              <HiCheckCircle className="inline" /> Complete
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() =>
+                                handleUpdateDeliveryStatus(item._id, "Arrived")
+                              }
+                              className="text-green-500 hover:underline hover:text-orange-700  hover:font-bold flex items-center gap-1 font-semibold  "
+                            >
+                              <HiCheckCircle className="inline" /> Complete
+                            </button>
+                          ))}
                       </div>
                     }
-                  </Table.Cell>
+                  </Table.Cell>{" "}
+                  {/* Reviews Section */}
+                  {item.deliveryStatus === "Arrived" && (
+                    <Table.Cell>
+                      {" "}
+                      <Link to={`/productview/${item.productsId}`}>Add review</Link>
+                    </Table.Cell>
+                  )}
                 </Table.Row>
               </Table.Body>
             ))}

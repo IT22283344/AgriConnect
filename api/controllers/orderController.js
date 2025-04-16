@@ -21,6 +21,7 @@ export const createOrder = async (req, res, next) => {
     !req.body.state ||
     !req.body.zip ||
     !req.body.subtotal ||
+    !req.body.cartTotalQuantity ||
     !req.body.deliveryfee ||
     !req.body.totalcost
   ) {
@@ -43,6 +44,7 @@ export const createOrder = async (req, res, next) => {
   const zip = req.body.zip;
   const status = req.body.status;
   const deliveryStatus = req.body.deliveryStatus;
+  const cartTotalQuantity = req.body.cartTotalQuantity;
   const subtotal = req.body.subtotal;
   const deliveryfee = req.body.deliveryfee;
   const totalcost = req.body.totalcost;
@@ -69,6 +71,7 @@ export const createOrder = async (req, res, next) => {
     zip,
     status,
     subtotal,
+    cartTotalQuantity,
     deliveryfee,
     totalcost,
     deliveryStatus,

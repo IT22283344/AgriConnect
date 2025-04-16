@@ -9,6 +9,32 @@ export default function WeatherForecast() {
   const [users, setUsers] = useState({});
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState(null);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  console.log(users);
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      // Ensure that the userDetails include province and district properties.
+      if (users.province && users.district) {
+        try {
+          // Construct URL with query parameters
+          const url = `http://localhost:5000/api/suggestions?province=${users.province.toLowerCase()}&district=${users.district.toLowerCase()}`;
+          const res = await fetch(url, { method: "GET" });
+          const data = await res.json();
+          if (res.ok) {
+            setRecommendedProducts(data.products);
+          } else {
+            console.error("API Error:", data.error);
+            setError(data.error || "Error fetching recommendations");
+          }
+        } catch (err) {
+          console.error("API call failed:", err);
+          setError("Error fetching recommendations");
+        }
+      }
+    };
+
+    fetchRecommendations();
+  }, [users.province, users.district]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,8 +45,7 @@ export default function WeatherForecast() {
       try {
         const res = await fetch(`/api/user/getuser/${currentUser._id}`);
         const data = await res.json();
-        if (res.ok) 
-          setUsers(data);
+        if (res.ok) setUsers(data);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -49,12 +74,20 @@ export default function WeatherForecast() {
   return (
     <div className="relative w-full h-screen flex flex-col items-center justify-center text-white">
       {/* Background Video */}
-      <video autoPlay loop muted className="absolute top-0 left-0 w-full h-full object-cover z-[-1]">
-        <source src="https://cdn.pixabay.com/video/2024/05/29/214409_tiny.mp4" type="video/mp4" />
+      <video
+        autoPlay
+        loop
+        muted
+        className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"
+      >
+        <source
+          src="https://cdn.pixabay.com/video/2024/05/29/214409_tiny.mp4"
+          type="video/mp4"
+        />
       </video>
-      
+
       {/* Weather Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -70,7 +103,10 @@ export default function WeatherForecast() {
               className="w-20 mx-auto my-2"
             />
             <p className="text-4xl font-bold">{weather.current.temp_c}°C</p>
-            <p className="text-sm mt-1">Humidity: {weather.current.humidity}% | Wind: {weather.current.wind_kph} km/h</p>
+            <p className="text-sm mt-1">
+              Humidity: {weather.current.humidity}% | Wind:{" "}
+              {weather.current.wind_kph} km/h
+            </p>
           </div>
         ) : (
           <p className="text-lg">Loading weather data...</p>
@@ -79,22 +115,62 @@ export default function WeatherForecast() {
 
       {/* 5-Day Forecast */}
       {weather && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
           className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4"
         >
           {weather.forecast.forecastday.map((day) => (
-            <div key={day.date} className="bg-white bg-opacity-20 backdrop-blur-md p-4 rounded-lg text-center">
-              <p className="font-semibold">{new Date(day.date).toLocaleDateString("en-US", { weekday: "short" })}</p>
-              <img src={day.day.condition.icon} alt="Weather Icon" className="w-12 mx-auto my-1" />
+            <div
+              key={day.date}
+              className="bg-white bg-opacity-20 backdrop-blur-md p-4 rounded-lg text-center"
+            >
+              <p className="font-semibold">
+                {new Date(day.date).toLocaleDateString("en-US", {
+                  weekday: "short",
+                })}
+              </p>
+              <img
+                src={day.day.condition.icon}
+                alt="Weather Icon"
+                className="w-12 mx-auto my-1"
+              />
               <p className="text-lg font-bold">{day.day.avgtemp_c}°C</p>
               <p className="text-4xl font-bold">{weather.current.temp_c}°C</p>
-            <p className="text-sm mt-1">Humidity: {weather.current.humidity}% | Wind: {weather.current.wind_kph} km/h</p>
+              <p className="text-sm mt-1">
+                Humidity: {weather.current.humidity}% | Wind:{" "}
+                {weather.current.wind_kph} km/h
+              </p>
             </div>
           ))}
         </motion.div>
+      )}
+
+      <h1 className="text-3xl font-bold">Product Recommendations</h1>
+
+      {error && <p className="mt-4 text-red-500">{error}</p>}
+
+      {recommendedProducts.length > 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6 bg-white bg-opacity-20 backdrop-blur-md p-4 rounded-lg shadow-md"
+        >
+          <h3 className="text-xl font-bold mb-2">
+            Recommended Products for Your Area:
+          </h3>
+          <ul>
+            {recommendedProducts.map((product, index) => (
+              <li key={index} className="text-lg">
+                {product}
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      ) : (
+        <p className="mt-6 text-lg">No recommendations available.</p>
       )}
     </div>
   );

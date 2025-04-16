@@ -60,13 +60,17 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 300,
     },
+    cartTotalQuantity: {
+      type:Number,
+      required:true,
+    },
     totalcost: {
       type: Number,
       required: true,
     },
     deliveryStatus: {
       type: String,
-      enum: ["ready", "OnTheWay", "Arrived"],
+      enum: ["Pending","ready", "OnTheWay", "Arrived"],
       default: "Pending",
     },
   },
