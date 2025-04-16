@@ -15,7 +15,6 @@ export default function OrderSummary() {
   const { currentUser } = useSelector((state) => state.user);
   const farmerId = cart.cartItems.length > 0 ? cart.cartItems[0].FId : null; // retrieve low level items
 
-
   const [payHereFormData, setpayHereFormData] = useState({
     userId: currentUser._id,
     farmerId,
@@ -30,12 +29,13 @@ export default function OrderSummary() {
     address: "",
     state: "",
     zip: "",
+    cartTotalQuantity:cart.cartTotalQuantity,
     subtotal: cart.cartTotalAmount,
     deliveryfee: 300,
     totalcost: cart.cartTotalAmount + 300,
   });
 
-  console.log(payHereFormData)
+  console.log(payHereFormData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -289,7 +289,7 @@ export default function OrderSummary() {
                 </label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
                     id=""
                     name=""
                     className="w-full rounded-md border border-gray-200 px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
@@ -364,7 +364,16 @@ export default function OrderSummary() {
                 </div>
                 <br />
 
-                <div className="mt-6 border-t border-b py-2">
+                <div className="mt-6 border-t border-b py-2 m-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-gray-900">
+                      Total Quentity
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      {cart.cartTotalQuantity} Kg
+                    </p>
+                  </div>
+
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900">
                       Subtotal

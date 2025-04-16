@@ -18,7 +18,7 @@ const cartSlice = createSlice({
       );
     
       if (existingIndex >= 0) {
-        state.cartItems[existingIndex].cartTotalQuantity += 1;
+        state.cartItems[existingIndex].cartTotalQuantity += 5;
       } else {
         const tempProduct = { ...product, cartTotalQuantity: 1, userId, FId };
         state.cartItems.push(tempProduct);
@@ -39,7 +39,7 @@ const cartSlice = createSlice({
       );
     
       if (state.cartItems[itemIndex].cartTotalQuantity > 1) {
-        state.cartItems[itemIndex].cartTotalQuantity -= 1;
+        state.cartItems[itemIndex].cartTotalQuantity -= 5;
       } else {
         state.cartItems = state.cartItems.filter(
           (cartItem) => cartItem._id !== _id || cartItem.userId !== userId

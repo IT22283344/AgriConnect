@@ -54,6 +54,7 @@ export default function DashProducts() {
 
   return (
     <div className="container mx-auto p-6">
+     
       <h1 className="text-2xl font-semibold text-green-700 pb-4">Products</h1>
       {Array.isArray(userProducts) && userProducts.length  > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow-lg bg-white p-4">

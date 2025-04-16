@@ -54,7 +54,7 @@ export const signup = async (req, res, next) => {
     const count = await User.countDocuments({ role: role });
 
     // 2. Generate userId e.g., FID1, WS1, etc.
-    const userId = `${prefix}${count + 1}`;
+    const userId = `${prefix}${count + 2}`;
 
     // 3. Hash password and save user
     const hashedPassword = bcryptjs.hashSync(password, 10);
