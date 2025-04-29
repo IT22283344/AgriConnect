@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Pages/Home';
 import SignIn from './Pages/SignIn';
@@ -19,6 +20,7 @@ import UpdateReview from './Pages/UpdateReview.';
 import OrderSuccess from './Pages/OrdeSuccess';
 import AveragePrice from './Pages/AveragePrice';
 import ReviewForm from './Components/ReviewForm';
+import DashsellersOrders from './Components/DashsellersOrders';
 
 
 export default function App() {
@@ -40,11 +42,12 @@ export default function App() {
         <Route path='/updatereview/:reviewId'element={<UpdateReview/>}/>
         <Route path='/ordersuccess'element={<OrderSuccess/>}/>
         <Route path='/averageprice'element={<AveragePrice/>}/>
-        <Route path='/reviewform'element={<ReviewForm/>}/>
+        <Route path='/reviewform/:productId/:farmerId'element={<ReviewForm/>}/>
+        <Route path='/ordersummary'element={<OrderSummary/>}/>
 
 
         <Route path='/cart'element={<Cart/>}/>
-        <Route path='/ordersummary'element={<OrderSummary/>}/>
+        <Route path='/sellerorder'element={<DashsellersOrders/>}/>
 
         <Route element={<OnlyAdminPrivateRoute />}></Route>
 
@@ -57,3 +60,5 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
+

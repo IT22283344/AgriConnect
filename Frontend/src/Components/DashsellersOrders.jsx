@@ -134,9 +134,8 @@ export default function DashsellersOrders() {
       <div className="flex flex-row gap-8 m-5">
         <Card>Total orders</Card>
         <Card>Pending orders</Card>
-        <Card>Completed  orders</Card>
+        <Card>Completed orders</Card>
         <Card>On going orders</Card>
-
       </div>
       <h1 className="pt-6 px-4 font-semibold">My Orders</h1>
       {Array.isArray(Order) && Order.length > 0 ? (
@@ -221,7 +220,8 @@ export default function DashsellersOrders() {
                     {
                       <div className="flex justify-end gap-2 mt-6">
                         {currentUser?.role === "wholeseller" &&
-                          (item.deliveryStatus === "Arrived" || item.deliveryStatus === "Pending" ? (
+                          (item.deliveryStatus === "Arrived" ||
+                          item.deliveryStatus === "Pending" ? (
                             <button
                               disabled
                               onClick={() =>
@@ -245,12 +245,17 @@ export default function DashsellersOrders() {
                     }
                   </Table.Cell>{" "}
                   {/* Reviews Section */}
-                  {item.deliveryStatus === "Arrived" && (
-                    <Table.Cell>
-                      {" "}
-                      <Link to={`/productview/${item.productsId}`}>Add review</Link>
-                    </Table.Cell>
-                  )}
+                  {console.log(item)}
+                  {item.deliveryStatus === "Arrived" &&
+                    item.productsId.map((product, index) => (
+                      <Table.Cell key={index}>
+                        {console.log(product.proId)}
+                        <Link to={`/reviewform/${product.proId}/${item.farmerId}`}>
+                          Add review
+                        </Link>
+                        
+                      </Table.Cell>
+                    ))}
                 </Table.Row>
               </Table.Body>
             ))}

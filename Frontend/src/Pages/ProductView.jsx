@@ -1,3 +1,6 @@
+
+
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -61,9 +64,8 @@ export default function ProductView() {
 
   const handleAddToCart = (product) => {
     if (user) {
-      dispatch(addToCart({ product, userId: user.id, FId: product.userId }));
+      dispatch(addToCart({ product, userId: user.id, FId: product.userId ,proId:product._id}));
       showNotification("Product added to the cart");
-      console.log(product.userId);
     } else {
       console.log("User not logged in");
     }
@@ -319,7 +321,7 @@ export default function ProductView() {
 
       {/* Reviews Section */}
       <div className="mt-6">
-        {currentUser?.role === "wholeseller" && <ReviewForm />}
+        {/*currentUser?.role === "wholeseller" && <ReviewForm />*/}
         <ReviewDisplay productId={product?._id} />
       </div>
 
@@ -331,3 +333,4 @@ export default function ProductView() {
     </main>
   );
 }
+
