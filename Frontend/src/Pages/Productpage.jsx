@@ -39,21 +39,15 @@ export default function ProductPage() {
       setLoading(true);
       setShowMore(false);
 
-      const urlParams = new URLSearchParams(location.search);
-
-      if (currentUser?.district) {
-        urlParams.set("district", currentUser.district);
+      const searchParams = new URLSearchParams(location.search);
+      if (sidebardata.isNearby && currentUser?.district) {
+        searchParams.set("district", currentUser.district);
       }
 
-      if (isNearbyFromUrl) {
-        urlParams.set("isNearby", "true");
-      }
-
-      const searchQuery = urlParams.toString();
-      const res = await fetch(`/api/product/getproductlists?${searchQuery}`);
+      const res = await fetch(`/api/product/getproductlists?${searchParams}`);
       let data = await res.json();
 
-      if (isNearbyFromUrl && currentUser?.district) {
+      if (sidebardata.isNearby && currentUser?.district) {
         data = data.filter(
           (product) => product.district === currentUser.district
         );
@@ -75,7 +69,7 @@ export default function ProductPage() {
       });
 
       setShowMore(data.length > 7);
-      setProducts(data);
+      setProducts(sortedData);
       setLoading(false);
     };
 
@@ -86,20 +80,20 @@ export default function ProductPage() {
     const { id, value, checked } = e.target;
 
     if (["all", "vegetables", "fruits", "grains", "other"].includes(id)) {
-      setSidebardata({ ...sidebardata, category: id });
+      setSidebardata((prev) => ({ ...prev, category: id }));
     }
 
     if (id === "searchTerm") {
-      setSidebardata({ ...sidebardata, searchTerm: value });
+      setSidebardata((prev) => ({ ...prev, searchTerm: value }));
     }
 
     if (id === "sort_order") {
       const [sort, order] = value.split("_");
-      setSidebardata({ ...sidebardata, sort, order });
+      setSidebardata((prev) => ({ ...prev, sort, order }));
     }
 
     if (id === "nearbyMe") {
-      setSidebardata({ ...sidebardata, isNearby: checked });
+      setSidebardata((prev) => ({ ...prev, isNearby: checked }));
     }
   };
 
@@ -118,17 +112,15 @@ export default function ProductPage() {
     const startIndex = products.length;
     const urlParams = new URLSearchParams(location.search);
     urlParams.set("startIndex", startIndex);
-    const res = await fetch(
-      `/api/product/getproductlists?${urlParams.toString()}`
-    );
+    const res = await fetch(`/api/product/getproductlists?${urlParams}`);
     const data = await res.json();
     if (data.length < 8) setShowMore(false);
-    setProducts([...products, ...data]);
+    setProducts((prev) => [...prev, ...data]);
   };
 
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="p-6 w-full md:w-1/4 lg:w-1/5 bg-white shadow-lg rounded-lg border border-gray-200">
+    <div className="flex flex-col md:flex-row gap-4 p-4">
+      <div className="w-full md:w-1/4 lg:w-1/5 bg-white p-4 rounded-lg shadow border border-gray-200">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col">
             <label className="font-semibold text-gray-700">Search:</label>
@@ -136,7 +128,7 @@ export default function ProductPage() {
               type="text"
               placeholder="Search..."
               id="searchTerm"
-              className="border rounded-lg p-3 w-full mt-1 text-gray-800 focus:ring-2 focus:ring-lime-600 outline-none transition"
+              className="border rounded-lg p-2 w-full text-gray-800 focus:ring-2 focus:ring-lime-600 outline-none"
               value={sidebardata.searchTerm}
               onChange={handleChange}
             />
@@ -144,17 +136,16 @@ export default function ProductPage() {
 
           <div className="flex flex-col">
             <label className="font-semibold text-gray-700">Category:</label>
-            <div className="flex flex-wrap gap-3 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {["all", "vegetables", "fruits", "grains", "other"].map((cat) => (
                 <label
                   key={cat}
-                  className={`cursor-pointer flex items-center gap-2 px-3 py-2 rounded-lg 
+                  className={`cursor-pointer flex items-center px-3 py-1 rounded-full text-sm font-medium transition 
                   ${
                     sidebardata.category === cat
                       ? "bg-lime-600 text-white"
-                      : "bg-gray-100 text-gray-700"
-                  } 
-                  hover:bg-lime-500 hover:text-white transition`}
+                      : "bg-gray-200 text-gray-700 hover:bg-lime-500 hover:text-white"
+                  }`}
                 >
                   <input
                     type="radio"
@@ -174,7 +165,7 @@ export default function ProductPage() {
             <select
               onChange={handleChange}
               id="sort_order"
-              className="border rounded-lg p-3 mt-1 text-gray-800 focus:ring-2 focus:ring-lime-100 outline-none transition"
+              className="border rounded-lg p-2 text-gray-800 focus:ring-2 focus:ring-lime-600 outline-none"
             >
               <option value="createdAt_desc"> Latest</option>
               <option value="createdAt_asc"> Oldest</option>
@@ -195,37 +186,26 @@ export default function ProductPage() {
             </label>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <button className="bg-lime-700 text-white font-semibold py-3 rounded-lg hover:bg-lime-800 transition">
-              Search
-            </button>
-            {/*<button
-              type="button"
-              // onClick={clearFilters}
-              className="bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition"
-            >
-              Clear Filters
-            </button>*/}
-          </div>
+          <button className="bg-lime-700 text-white font-semibold py-2 rounded-lg hover:bg-lime-800 transition">
+            Search
+          </button>
         </form>
       </div>
 
-      <div className="flex-1 w-4/5 m-4 relative">
-        <h1 className="text-2xl font-semibold border-b text-start p-4 pb-6">
+      <div className="w-full md:flex-1">
+        <h1 className="text-xl md:text-2xl font-semibold border-b pb-3 px-2">
           Product Listings
         </h1>
 
         {loading && (
-          <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-80">
+          <div className="flex justify-center items-center py-10">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-lime-600"></div>
           </div>
         )}
 
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-2">
           {!loading && products.length === 0 && (
-            <p className="text-center text-gray-500 w-full">
-              No Products Found!
-            </p>
+            <p className="text-center text-gray-500 w-full">No Products Found!</p>
           )}
 
           {products.map((product) => (
@@ -237,7 +217,7 @@ export default function ProductPage() {
           <div className="flex justify-center mt-4">
             <button
               onClick={onShowMoreClick}
-              className="bg-lime-700 text-white font-semibold py-2 px-8 rounded-lg hover:bg-lime-800 transition"
+              className="bg-lime-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-lime-800 transition"
             >
               Show More ...
             </button>
