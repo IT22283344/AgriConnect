@@ -21,6 +21,7 @@ export default function OrderSummary() {
     productsId: cart.cartItems?.map((cartItem) => ({
       productname: cartItem.productname,
       quantity: cartItem.cartTotalQuantity,
+      proId: cartItem.proId,
     })),
     first_name: "",
     last_name: "",

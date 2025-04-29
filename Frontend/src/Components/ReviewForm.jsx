@@ -1,3 +1,5 @@
+
+
 import { Textarea, Alert, Button, FileInput, Select } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -12,7 +14,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { FaStar } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function ReviewForm({ productname }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -25,6 +27,7 @@ export default function ReviewForm({ productname }) {
   const [rating, setRating] = useState("");
   const [error, setError] = useState(false);
   const [product, setProduct] = useState("");
+  const navigate = useNavigate();
   const params = useParams();
 
   const handleSubmit = async (e) => {
@@ -147,6 +150,7 @@ export default function ReviewForm({ productname }) {
         setReview("");
         setRating();
         setReviewError(null);
+        navigate('/sellerorder')
       }
       if (!res.ok) {
         setReviewError(data.message);
@@ -164,6 +168,8 @@ export default function ReviewForm({ productname }) {
           `/api/product/getproductlists/${params.productId}`
         );
         const data = await res.json();
+        console.log(data)
+
         if (data.success === false) {
           setError(true);
           return;
@@ -297,3 +303,13 @@ export default function ReviewForm({ productname }) {
     </form>
   );
 }
+
+
+
+
+
+
+
+
+
+
