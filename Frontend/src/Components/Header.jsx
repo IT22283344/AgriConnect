@@ -70,6 +70,14 @@ export default function Header() {
           >
             About Us
           </NavLink>
+          <NavLink
+            to="/contactus"
+            className={({ isActive }) =>
+              isActive ? "nav-link-active" : "nav-link"
+            }
+          >
+            Contactus
+          </NavLink>
           {currentUser?.role === "farmer" ? (
             <NavLink
               to={`/support/${currentUser.slug}`}
