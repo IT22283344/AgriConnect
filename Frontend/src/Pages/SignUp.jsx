@@ -9,7 +9,7 @@ import {
 } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuthenticate from "../Components/OAuthenticate";
-
+// making the sign up page responsive
 export default function SignUp() {
   const [formData, setFormData] = useState({
     username: "",
