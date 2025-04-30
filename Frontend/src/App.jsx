@@ -21,6 +21,8 @@ import OrderSuccess from './Pages/OrdeSuccess';
 import AveragePrice from './Pages/AveragePrice';
 import ReviewForm from './Components/ReviewForm';
 import DashsellersOrders from './Components/DashsellersOrders';
+import AboutUs from './Pages/Aboutus';
+
 
 
 export default function App() {
@@ -32,6 +34,7 @@ export default function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/" element={<Home />} />
+        <Route path='/aboutus' element={<AboutUs/>}/>
         <Route path="/support/:slug" element={<Support/>} />
         <Route element={<PrivateRoute />} />
         <Route path="/dashboard" element={<DashBoard />} />

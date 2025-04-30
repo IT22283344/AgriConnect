@@ -62,6 +62,14 @@ export default function Header() {
           >
             Category
           </NavLink>
+          <NavLink
+            to="/aboutus"
+            className={({ isActive }) =>
+              isActive ? "nav-link-active" : "nav-link"
+            }
+          >
+            About Us
+          </NavLink>
           {currentUser?.role === "farmer" ? (
             <NavLink
               to={`/support/${currentUser.slug}`}
