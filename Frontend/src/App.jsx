@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Pages/Home';
 import SignIn from './Pages/SignIn';
@@ -22,6 +21,7 @@ import AveragePrice from './Pages/AveragePrice';
 import ReviewForm from './Components/ReviewForm';
 import DashsellersOrders from './Components/DashsellersOrders';
 import AboutUs from './Pages/Aboutus';
+import ContactUs from './Pages/ContactUs';
 
 
 
@@ -35,6 +35,7 @@ export default function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/" element={<Home />} />
         <Route path='/aboutus' element={<AboutUs/>}/>
+        <Route path='/contactus' element={<ContactUs/>}/>
         <Route path="/support/:slug" element={<Support/>} />
         <Route element={<PrivateRoute />} />
         <Route path="/dashboard" element={<DashBoard />} />
@@ -63,5 +64,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
-
