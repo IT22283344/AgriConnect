@@ -1,4 +1,4 @@
-import { Button, Modal, Table } from "flowbite-react";
+import { Button, Card, Modal, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
@@ -10,7 +10,10 @@ export default function DashUsers() {
   const [showModel, setShowModel] = useState(false);
   const [memberIDToDelete, setmemberIdToDelete] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
- 
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  const [totalFarmers, settotalFarmers] = useState(0);
+  const [totalwholesellers, setTotalwholesellers] = useState(0);
 
   useEffect(() => {
     const fetchs = async () => {
@@ -21,9 +24,12 @@ export default function DashUsers() {
 
         const res = await fetch(`/api/user/getusers?searchTerm=${searchTerm}`);
         const data = await res.json();
-        console.log(data)
+        console.log(data);
         if (res.ok) {
           setUsers(data.users);
+          setTotalwholesellers(data.totalwholesellers || 0);
+          setTotalUsers(data.totalUsers || 0);
+          settotalFarmers(data.totalFarmers || 0);
         }
       } catch (error) {
         console.log(error.message);
@@ -33,10 +39,7 @@ export default function DashUsers() {
     if (currentUser.isAdmin) {
       fetchs();
     }
-    
-  }
-  
-  , [currentUser._id,searchTerm]);
+  }, [currentUser._id, searchTerm]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -63,11 +66,23 @@ export default function DashUsers() {
     setSelectedDepartment(e.target.value); // Update the selected department
   };*/
 
-
   return (
     <div className="p-6">
       {/* Search Bar */}
-      <div className="flex justify-center mb-4">
+
+      <div className="flex flex-row gap-8 m-5 justify-center">
+        <Card className="bg-lime-600 text-lg text-black font-semibold text-start content-start flex flex-row">
+          Total Users <span className="text-2xl">{totalUsers}</span>
+        </Card>
+        <Card className="bg-lime-400 text-black font-semibold">
+          Total Farmers <span className="text-2xl">{totalFarmers}</span>
+        </Card>
+        <Card className="bg-green-400 text-black font-semibold">
+          Total Wholesellers{" "}
+          <span className="text-2xl">{totalwholesellers}</span>
+        </Card>
+      </div>
+      <div className="flex justify-start mb-4">
         <input
           type="text"
           placeholder="Search members.."
@@ -79,8 +94,6 @@ export default function DashUsers() {
 
       {/* Radio Buttons */}
       <div className="flex justify-left items-center gap-4 mb-6 border border-gray-200 rounded-lg">
-     
-
         {/*Department wise filtering
         {departments.map((department) => (
           <label key={department} className="flex items-center">
@@ -97,9 +110,9 @@ export default function DashUsers() {
       </div>
 
       {/* Staff Table */}
-      {(currentUser?.isAdmin) && users.length > 0 ? (
+      {currentUser?.isAdmin && users.length > 0 ? (
         <Table hoverable className="shadow-sm">
-          <Table.Head >
+          <Table.Head>
             <Table.HeadCell>ID</Table.HeadCell>
             <Table.HeadCell>Name</Table.HeadCell>
             <Table.HeadCell>Email</Table.HeadCell>
@@ -111,40 +124,42 @@ export default function DashUsers() {
             <Table.HeadCell>Town</Table.HeadCell>
             <Table.HeadCell>Delete</Table.HeadCell>
           </Table.Head>
-          {users.filter((member) => {
-            return (
-              (searchTerm === "" ||
-                member.username.toLowerCase().includes(
-                  searchTerm.toLowerCase()
-                ) ||
-                member._id)
-            );
-          }).map((member) => (
-            <Table.Body className="divide-y" key={member._id}>
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell>{member.userId}</Table.Cell>
-                <Table.Cell>{member.username}</Table.Cell>
-                <Table.Cell>{member.email}</Table.Cell>
-                <Table.Cell>{member.mobile}</Table.Cell>
-                <Table.Cell>{member.adress}</Table.Cell>
-                <Table.Cell>{member.role}</Table.Cell>
-                <Table.Cell>{member.province}</Table.Cell>
-                <Table.Cell>{member.district}</Table.Cell>
-                <Table.Cell>{member.town}</Table.Cell>
-                <Table.Cell>
-                  <span
-                    className="font-medium text-red-500 hover:underline cursor-pointer"
-                    onClick={() => {
-                      setShowModel(true);
-                      setmemberIdToDelete(member._id);
-                    }}
-                  >
-                    Delete
-                  </span>
-                </Table.Cell>                
-              </Table.Row>
-            </Table.Body>
-          ))}
+          {users
+            .filter((member) => {
+              return (
+                searchTerm === "" ||
+                member.username
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase()) ||
+                member._id
+              );
+            })
+            .map((member) => (
+              <Table.Body className="divide-y" key={member._id}>
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell>{member.userId}</Table.Cell>
+                  <Table.Cell>{member.username}</Table.Cell>
+                  <Table.Cell>{member.email}</Table.Cell>
+                  <Table.Cell>{member.mobile}</Table.Cell>
+                  <Table.Cell>{member.adress}</Table.Cell>
+                  <Table.Cell>{member.role}</Table.Cell>
+                  <Table.Cell>{member.province}</Table.Cell>
+                  <Table.Cell>{member.district}</Table.Cell>
+                  <Table.Cell>{member.town}</Table.Cell>
+                  <Table.Cell>
+                    <span
+                      className="font-medium text-red-500 hover:underline cursor-pointer"
+                      onClick={() => {
+                        setShowModel(true);
+                        setmemberIdToDelete(member._id);
+                      }}
+                    >
+                      Delete
+                    </span>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            ))}
         </Table>
       ) : (
         <p className="text-center text-gray-500">
@@ -176,7 +191,7 @@ export default function DashUsers() {
             </Button>
           </div>
         </Modal.Body>
-      </Modal>    
+      </Modal>
     </div>
   );
 }

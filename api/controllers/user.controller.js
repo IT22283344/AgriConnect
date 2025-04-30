@@ -128,8 +128,8 @@ export const getUsers = async (req, res, next) => {
 
 
     const totalUsers = await User.countDocuments();
-    const totalAdmins = await User.countDocuments({ isAdmin: true });
-    const totalCustomers = await User.countDocuments({ isAdmin: false });
+    const totalFarmers = await User.countDocuments({ role: "farmer" });
+    const totalwholesellers = await User.countDocuments({ role: "wholeseller" });
 
     const now = new Date();
 
@@ -155,8 +155,8 @@ export const getUsers = async (req, res, next) => {
       users: usersWithoutPassword,
       totalUsers,
       lastMonthCustomers,
-      totalAdmins,
-      totalCustomers,
+      totalwholesellers,
+      totalFarmers,
       lastMonthAdmin,
       lastMonthUsers
 
