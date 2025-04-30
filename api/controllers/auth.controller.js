@@ -3,37 +3,89 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
-
-
 export const signup = async (req, res, next) => {
-  const { username, email, password, mobile, adress,district,province,town,role } = req.body;
+  const {
+    username,
+    email,
+    password,
+    mobile,
+    adress,
+    district,
+    province,
+    town,
+    role,
+    slug,
+    userId,
+  } = req.body;
 
-  
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const mobileRegex = /^(071|076|077|075|078|070|074|072)\d{7}$/;
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{5,}$/;
 
-  if (!username || !email || !password || !mobile || !adress || !district|| !role||!province||!town||
-      username === "" || email === "" || password === "" || mobile === "" ||province === ""||adress === ""||district === ""||town === ""||role === "") {
-      return next(errorHandler(400, 'All fields are required'));
+  // Validation
+  if (
+    !username || !email || !password || !mobile || !adress || !district || !role || !province || !town ||
+    username.trim() === "" || email.trim() === "" || password.trim() === "" || mobile.trim() === "" ||
+    province.trim() === "" || adress.trim() === "" || district.trim() === "" || town.trim() === "" || role.trim() === ""
+  ) {
+    return next(errorHandler(400, 'All fields are required'));
   } else if (!emailRegex.test(email)) {
-      return next(errorHandler(400, 'Invalid email format'));
+    return next(errorHandler(400, 'Invalid email format'));
   } else if (!mobileRegex.test(mobile)) {
-      return next(errorHandler(400, 'Invalid mobile number format'));
+    return next(errorHandler(400, 'Invalid mobile number format'));
   } else if (!passwordRegex.test(password)) {
-      return next(errorHandler(400, 'Password should be at least 5 characters long and contain at least one uppercase letter, one digit, and one symbol (!@#$%^&*()_+).'));
-  }else if (username.length < 7 || req.body.username.length > 20) {
+    return next(errorHandler(400, 'Password should be at least 5 characters long and contain at least one uppercase letter, one digit, and one symbol (!@#$%^&*()_+).'));
+  } else if (username.length < 7 || username.length > 20) {
     return next(errorHandler(400, 'Username must be between 7 and 20 characters'));
-}
-
-  const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ username, email, password: hashedPassword, adress, mobile,province,district,town,role });
+  }
 
   try {
-      await newUser.save();
-      res.status(201).json({ message: "User created successfully" });
+    // 1. Count existing users with same role
+    const rolePrefixMap = {
+      farmer: "FID",
+      wholeseller: "WS",
+    };
+
+    const prefix = rolePrefixMap[role.toLowerCase()];
+    if (!prefix) {
+      return next(errorHandler(400, `Invalid role: ${role}`));
+    }
+
+    const count = await User.countDocuments({ role: role });
+
+    // 2. Generate userId e.g., FID1, WS1, etc.
+    const userId = `${prefix}${count + 2}`;
+
+    // 3. Hash password and save user
+    const hashedPassword = bcryptjs.hashSync(password, 10);
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      adress,
+      mobile,
+      province,
+      district,
+      town,
+      role,
+      slug,
+      userId,  // Add generated userId
+    });
+    console.log(newUser)
+
+    const savedUser = await newUser.save();
+
+    // Generate slug
+    const generatedSlug = `${username.split(" ")
+      .join("-")
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9-]/g, "")}-${savedUser._id}`;
+    savedUser.slug = generatedSlug;
+
+    const updatedUser = await savedUser.save();
+    res.status(201).json(updatedUser);
   } catch (err) {
-      next(err);
+    next(err);
   }
 };
 

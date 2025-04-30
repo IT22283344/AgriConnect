@@ -88,7 +88,7 @@ export const deleteUser = async(req,res,next)=>{
 }
 export const signout = (req, res, next) => {
   try {
-    res.clearCookie('access_token').status(200).json('User has been signed out');
+    res.clearCookie('acess_token').status(200).json('User has been signed out');
   } catch (error) {
     next(error);
   }
@@ -185,7 +185,7 @@ export const forgetpassword = async (req, res, next) => {
 
   
     user.verifytoken = token;
-    
+
     await user.save();
     
 
@@ -302,3 +302,25 @@ export const getWholesellers = async (req, res, next) => {
   }
 };
 
+
+const API_KEY = "ecc4f377165b4aa99f681229252503"; 
+const BASE_URL = "https://api.weatherapi.com/v1/forecast.json";
+
+export const weatherData =async (req, res) => {
+  const { location,days } = req.query; 
+  if (!location) return res.status(400).json({ error: "Location is required" });
+
+  try {
+    const response = await fetch(`${BASE_URL}?key=${API_KEY}&q=${location}&days=${days || 7}`);
+    const data = await response.json();
+      console.log(data)
+      if (response.ok) {
+          res.json(data); 
+      } else {
+          res.status(response.status).json({ error: data.error.message });
+      }
+  } catch (error) {
+      console.error("Error fetching weather data:", error);
+      res.status(500).json({ error: "Failed to fetch weather data" });
+  }
+};

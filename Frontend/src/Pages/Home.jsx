@@ -1,6 +1,7 @@
-import React from 'react'
+
 import { HomeHero } from '../Components/HomeHero'
 import HeroSection from '../Components/HeroSection'
+import Footer from '../Components/Footer'
 
 
 export default function Home() {
@@ -8,6 +9,8 @@ export default function Home() {
     <div>
       <HeroSection/>
       <HomeHero/>
+      <Footer/>
+
     </div>
 
   )
